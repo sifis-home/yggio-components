@@ -1,0 +1,18 @@
+interface Channel {
+<<<<<<< HEAD
+  _id?: string;
+  topic: string;
+=======
+  [protocol: string]: object; // This one can be typed better
+  _id: string;
+  name: string;
+>>>>>>> 9e1694505b01e9345358cf3ba45fab013456fb93
+  iotnode: string;
+}
+
+type Channels = Channel[];
+
+export {
+  Channel,
+  Channels,
+};

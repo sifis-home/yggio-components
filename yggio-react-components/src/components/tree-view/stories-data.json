@@ -1,0 +1,94 @@
+{
+  "root": {
+    "_id": "5e833f94961ccc4bedf31acc",
+    "name": "Unit with all the managers",
+    "children": [
+      {
+        "_id": "5e833f94961ccc4bedf31ad1",
+        "name": "svedala",
+        "children": [
+          {
+            "_id": "5e833f94961ccc4bedf31ad3",
+            "name": "nay0",
+            "children": [
+              {
+                "_id": "5e833f94961ccc4bedf31ad5",
+                "name": "street00",
+                "children": [
+                  {
+                    "_id": "5e833f94961ccc4bedf31ad7",
+                    "name": "house000",
+                    "children": []
+                  },
+                  {
+                    "_id": "5e833f94961ccc4bedf31ad9",
+                    "name": "house001",
+                    "children": []
+                  }
+                ]
+              },
+              {
+                "_id": "5e833f94961ccc4bedf31adb",
+                "name": "street01",
+                "children": [
+                  {
+                    "_id": "5e833f94961ccc4bedf31add",
+                    "name": "house010",
+                    "children": []
+                  },
+                  {
+                    "_id": "5e833f94961ccc4bedf31adf",
+                    "name": "house011",
+                    "children": []
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "_id": "5e833f94961ccc4bedf31ae1",
+            "name": "nay1",
+            "children": [
+              {
+                "_id": "5e833f94961ccc4bedf31ae3",
+                "name": "street10",
+                "children": [
+                  {
+                    "_id": "5e833f94961ccc4bedf31ae5",
+                    "name": "house100",
+                    "children": []
+                  },
+                  {
+                    "_id": "5e833f94961ccc4bedf31ae7",
+                    "name": "house101",
+                    "children": []
+                  }
+                ]
+              },
+              {
+                "_id": "5e833f94961ccc4bedf31ae9",
+                "name": "street11",
+                "children": [
+                  {
+                    "_id": "5e833f94961ccc4bedf31aeb",
+                    "name": "house110",
+                    "children": []
+                  },
+                  {
+                    "_id": "5e833f94961ccc4bedf31aed",
+                    "name": "house111",
+                    "children": []
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }, {
+        "_id": "5e833f94961ccc4bedf31adxxx",
+        "name": "lund",
+        "children": []
+      }
+    ]
+  }
+}

@@ -1,0 +1,54 @@
+{
+  "normal":  [
+    {
+      "label": "description",
+      "tabId": "desc"
+    },{
+      "label": "users",
+      "tabId": "usrs",
+      "meta": "5"
+    },{
+      "label": "subunits",
+      "tabId": "subus",
+      "meta": "122"
+    },{
+      "label": "iotnodes",
+      "tabId": "iots",
+      "meta": "!"
+    }
+  ],
+  "big": [
+    {
+      "label": "many",
+      "tabId": "1",
+      "meta": "!"
+    },{
+      "label": "many!",
+      "tabId": "2",
+      "meta": "12"
+    },{
+      "label": "long labels",
+      "tabId": "22",
+      "meta": "0"
+    },{
+      "label": "and meta!",
+      "tabId": "1337",
+      "meta": "1314"
+    },{
+      "label": "!!!!!!!!!!",
+      "tabId": "im uniq",
+      "meta": ""
+    },{
+      "label": "empty meta",
+      "tabId": "im uniq!!",
+      "meta": ""
+    },{
+      "label": "and meta:undefined is the same, No meta!",
+      "tabId": "asfasf"
+    },{
+      "label": "12341",
+      "tabId": "asfasfasfas",
+      "meta": "abc"
+    }
+  ]
+}

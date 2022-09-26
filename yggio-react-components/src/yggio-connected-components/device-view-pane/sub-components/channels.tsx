@@ -1,0 +1,225 @@
+/*
+ * Copyright 2022 Sensative AB
+ * 
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ */
+import React from 'react';
+import {useQueryClient, useMutation} from '@tanstack/react-query';
+import _ from 'lodash';
+import {toast} from 'react-hot-toast';
+import axios from 'axios';
+
+// Logic
+import {useLocalState} from '../../../hooks';
+import {channelState} from '../state';
+import {channelsRequests, devicesApi} from '../../../api';
+import {Device, Channel, Translate} from '../../../types';
+import {getFormValues} from '../../../utils/form-wizard';
+import {selectChannelFormIsValid} from '../selectors';
+import {extractChannelCreationData} from '../utils';
+
+// UI
+import TextField from '../../../components/text-field';
+import Select from '../../../components/select';
+import Button from '../../../components/button';
+import {COLORS} from '../../../constants';
+import {DeleteChannelButton, NoDataText} from '../styled';
+import {
+  FlexColWrapper,
+  FlexSpaceBetweenWrapper,
+  HorizontalLine,
+} from '../../../global/styled';
+
+interface Props {
+  device: Device;
+  channels?: Channel[];
+  t: Translate;
+}
+
+const Channels = (props: Props) => {
+
+  const channelForm = useLocalState(channelState);
+
+  const queryClient = useQueryClient();
+
+  const createChannelMutation = useMutation(
+    async (data: Omit<Channel, '_id'>) => channelsRequests.create(data),
+    {
+      onSuccess: async () => {
+        await queryClient.invalidateQueries(['channels']);
+        channelForm.resetForm();
+      },
+      onError: err => {
+        if (axios.isAxiosError(err)) {
+          toast.error(`${err.response?.status} - ${err.response?.data}`);
+        }
+      }
+    },
+  );
+
+  const removeChannelMutation = useMutation(
+    async (channelId: string) => channelsRequests.remove(channelId),
+    {
+      onSuccess: async () => {
+        await queryClient.invalidateQueries(['channels']);
+      },
+      onError: err => {
+        if (axios.isAxiosError(err)) {
+          toast.error(`${err.response?.status} - ${err.response?.data}`);
+        }
+      }
+    },
+  );
+
+  const disegoConnectorsQuery = devicesApi.useDevicesQuery({
+    params: {
+      filter: {
+        nodeType: 'desigo-cc-connector',
+      },
+    },
+    select: data => data,
+  });
+
+  const createNewChannel = () => {
+    const data = extractChannelCreationData(
+      props.device._id,
+      getFormValues(channelForm.formInputs)
+    );
+    createChannelMutation.mutate(data);
+  };
+
+  // Sadly our form-wizard is lacking and is unable to handle the validation
+  const formIsValid = selectChannelFormIsValid({formInputs: channelForm.formInputs});
+
+  const selectedProtocol = channelForm.formInputs.protocol.value as string;
+
+  return (
+    <FlexColWrapper>
+      {_.isEmpty(props.channels) && <NoDataText>{props.t('phrases.noChannelsAdded')}</NoDataText>}
+      {!_.isEmpty(props.channels) && (
+        <>
+          <b>{_.capitalize(props.t('titles.topics'))}</b>
+          {_.map(props.channels, channel => (
+            <FlexSpaceBetweenWrapper key={channel._id} style={{margin: '2px', background: COLORS.greyLight}}>
+              <>
+                {_.get(channel, 'readableFormat')}
+                <DeleteChannelButton onClick={() => removeChannelMutation.mutate(channel._id)}>
+                  ✖
+                </DeleteChannelButton>
+              </>
+            </FlexSpaceBetweenWrapper>
+          ))}
+        </>
+      )}
+
+      <HorizontalLine />
+
+      <FlexColWrapper style={{width: '500px'}}>
+
+        <h4>Create new channel</h4>
+
+        <TextField
+          label={'Name'}
+          additionalInfo={'Used only for referencing - can be set to anything.'}
+          value={channelForm.formInputs.name.value as string}
+          onChange={(evt: React.ChangeEvent<HTMLInputElement>) => channelForm.setInputValue('name', evt.target.value)}
+          margin={'5px 0 0 0'}
+        />
+
+        <Select
+          label={'Protocol'}
+          options={[
+            {value: 'mqtt', label: 'MQTT'},
+            {value: 'http', label: 'HTTP'},
+            {value: 'azureIotHub', label: 'Azure IoT Hub'},
+            {value: 'desigoCC', label: 'Siemens Desigo CC'},
+          ]}
+          isClearable
+          value={channelForm.formInputs.protocol.value as string}
+          onChange={(evt: React.ChangeEvent<HTMLInputElement>) => channelForm.setInputValue('protocol', evt.target.value)}
+          margin={'15px 0 0 0'}
+        />
+
+        {selectedProtocol === 'mqtt' && (
+          <>
+            <Select
+              label={'Type'}
+              options={[
+                {value: 'keycloakUser', label: 'keycloakUser'},
+                {value: 'basicCredentialsSet', label: 'basicCredentialsSet'},
+              ]}
+              value={channelForm.formInputs.type.value as string}
+              onChange={(evt: React.ChangeEvent<HTMLInputElement>) => channelForm.setInputValue('type', evt.target.value)}
+              margin={'15px 0 0 10px'}
+            />
+            <TextField
+              label={'Recipient'}
+              value={channelForm.formInputs.recipient.value as string}
+              onChange={(evt: React.ChangeEvent<HTMLInputElement>) => channelForm.setInputValue('recipient', evt.target.value)}
+              margin={'15px 0 0 10px'}
+            />
+          </>
+        )}
+
+        {selectedProtocol === 'http' && (
+          <TextField
+            label={'URL'}
+            value={channelForm.formInputs.url.value as string}
+            onChange={(evt: React.ChangeEvent<HTMLInputElement>) => channelForm.setInputValue('url', evt.target.value)}
+            margin={'15px 0 0 10px'}
+          />
+        )}
+
+        {selectedProtocol === 'azureIotHub' && (
+          <TextField
+            label={'Connection string'}
+            value={channelForm.formInputs.connectionString.value as string}
+            onChange={(evt: React.ChangeEvent<HTMLInputElement>) => channelForm.setInputValue('connectionString', evt.target.value)}
+            margin={'15px 0 0 10px'}
+          />
+        )}
+
+        {selectedProtocol === 'desigoCC' && (
+          <>
+            <Select
+              label={'Connector'}
+              options={_.map(disegoConnectorsQuery.data as Device[], device => ({
+                value: device._id,
+                label: device.name,
+              }))}
+              value={channelForm.formInputs.connector.value as string}
+              onChange={(evt: React.ChangeEvent<HTMLInputElement>) => channelForm.setInputValue('connector', evt.target.value)}
+              margin={'15px 0 0 10px'}
+            />
+            <TextField
+              label={'Desigo Object'}
+              value={channelForm.formInputs.desigoObject.value as string}
+              onChange={(evt: React.ChangeEvent<HTMLInputElement>) => {
+                channelForm.setInputValue('desigoObject', evt.target.value);
+              }}
+              validationErrorMessage={
+                channelForm.formInputs.desigoObject.value
+                  ? channelForm.formInputs.desigoObject.validation.message : null
+              }
+              margin={'15px 0 0 10px'}
+            />
+          </>
+        )}
+
+        <Button
+          label={'Create channel'}
+          isLoading={createChannelMutation.isLoading}
+          disabled={!formIsValid}
+          width={'140px'}
+          onClick={createNewChannel}
+          color={'green'}
+          margin={'30px 0 0 0'}
+        />
+      </FlexColWrapper>
+    </FlexColWrapper>
+  );
+};
+
+export default Channels;

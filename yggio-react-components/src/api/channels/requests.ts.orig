@@ -1,0 +1,44 @@
+import {request} from '../request';
+
+import {
+  HTTP_METHODS,
+  RESOURCE_TYPES,
+} from '../../constants';
+import {Channel, Channels} from '../../types';
+
+const create = async (channel: Omit<Channel, '_id'>) => request({
+  method: HTTP_METHODS.Post,
+  URI: `${RESOURCE_TYPES.channels}`,
+  data: channel,
+});
+
+<<<<<<< HEAD
+const createMany = async (channels: Channels) => request({
+  method: HTTP_METHODS.Post,
+  URI: `${RESOURCE_TYPES.channels}/batch`,
+  data: channels,
+});
+
+const get = async (deviceId: string) => request({
+=======
+const get = async (deviceId: string) => request<Channel[]>({
+>>>>>>> 9e1694505b01e9345358cf3ba45fab013456fb93
+  method: HTTP_METHODS.Get,
+  URI: `${RESOURCE_TYPES.channels}`,
+  params: {
+    iotnode: deviceId,
+    formatReadable: true,
+  }
+});
+
+const remove = async (channelId: string) => request({
+  method: HTTP_METHODS.Delete,
+  URI: `${RESOURCE_TYPES.channels}/${channelId}`,
+});
+
+export {
+  get,
+  create,
+  createMany,
+  remove,
+};

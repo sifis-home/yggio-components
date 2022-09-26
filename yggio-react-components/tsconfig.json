@@ -1,0 +1,18 @@
+{
+  "extends": "../../../tsconfig.json",
+  "compilerOptions": {
+    "baseUrl": ".",
+    "lib": [
+      "dom",
+      "dom.iterable"
+    ],
+    "jsx": "preserve"
+  },
+  "include": [
+    "src/**/*.ts",
+    "src/**/*.tsx",
+    "global.d.ts",
+    "src/yggio-connected-components/device-view-pane/styled.js",
+    "mqtt-types.d.ts"
+  ]
+}

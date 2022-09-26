@@ -1,0 +1,127 @@
+// report-interval.js
+
+import React, {useState} from 'react';
+import TimeInterval from '../../../components/time-interval';
+import Button from '../../../components/button';
+import InfoBox from '../../../components/info-box';
+
+const ReportInterval = props => {
+  function msToTime(duration) {
+    var milliseconds = parseInt((duration % 1000) / 100),
+      seconds = Math.floor((duration / 1000) % 60),
+      minutes = Math.floor((duration / (1000 * 60)) % 60),
+      hours = Math.floor((duration / (1000 * 60 * 60)) % 24);
+
+    hours = (hours < 10) ? "0" + hours : hours;
+    minutes = (minutes < 10) ? "0" + minutes : minutes;
+    seconds = (seconds < 10) ? "0" + seconds : seconds;
+
+    return hours + ":" + minutes + ":" + seconds;
+  }
+  const [isSelectorOpen, setSelectorOpen] = useState(false);
+  const IsTableOpen = isSelectorOpen ? 'none' : 'block';
+  const IsTransSelectorOpen = !isSelectorOpen ? 'none' : 'block';
+  return (
+    <>
+      <h3>Expect report every: {props.deviceItem.expectedReportInterval ? msToTime(props.deviceItem.expectedReportInterval) : ""}</h3>
+      {!("expectedReportInterval" in props.deviceItem) && (
+        <>
+          <div style={{display: IsTableOpen}}>
+            <InfoBox
+              heading={'No time interval set'}
+              type={'neutral'}
+            />
+            <Button
+              style={{margin: '5px 0 0 0'}}
+              label={_.capitalize(props.t('labels.edit'))}
+              height={'34px'}
+              width={'100px'}
+              onClick={() => {
+                setSelectorOpen(true);
+              }}
+            />
+          </div>
+          <div style={{display: IsTransSelectorOpen}}>
+            <TimeInterval
+              onChange={props.handleExpectedReportInterval}
+              defaultValue={props.deviceItem.expectedReportInterval}
+            />
+            <Button
+              margin={'-34px 0px 0px 110px'}
+              label={_.capitalize(props.t('labels.cancel'))}
+              height={'34px'}
+              width={'100px'}
+              onClick={() => {
+                setSelectorOpen(false);
+              }}
+            />
+          </div>
+        </>
+      )}
+      {props.deviceItem.expectedReportInterval === 0 && (
+        <>
+          <div style={{display: IsTableOpen}}>
+            <InfoBox
+              heading={'No device model name selected'}
+              type={'info'}
+            />
+            <Button
+              style={{margin: '5px 0 0 0'}}
+              label={_.capitalize(props.t('labels.edit'))}
+              height={'34px'}
+              width={'100px'}
+              onClick={() => {
+                setSelectorOpen(true);
+              }}
+            />
+          </div>
+          <div style={{display: IsTransSelectorOpen}}>
+            <TimeInterval
+              onChange={props.handleExpectedReportInterval}
+              defaultValue={props.deviceItem.expectedReportInterval}
+            />
+            <Button
+              margin={'-34px 0px 0px 110px'}
+              label={_.capitalize(props.t('labels.cancel'))}
+              height={'34px'}
+              width={'100px'}
+              onClick={() => {
+                setSelectorOpen(false);
+              }}
+            />
+          </div>
+        </>
+      )}
+      {props.deviceItem.expectedReportInterval > 0 && (
+        <>
+          <div style={{display: IsTableOpen}}>
+            <Button
+                style={{margin: '5px 0 0 0'}}
+                label={_.capitalize(props.t('labels.edit'))}
+                height={'34px'}
+                width={'100px'}
+                onClick={() => {
+                  setSelectorOpen(true);
+                }}
+            />
+          </div>
+          <div style={{display: IsTransSelectorOpen}}>
+            <TimeInterval
+              onChange={props.handleExpectedReportInterval}
+              defaultValue={props.deviceItem.expectedReportInterval}
+            />
+            <Button
+              margin={'-34px 0px 0px 110px'}
+              label={_.capitalize(props.t('labels.cancel'))}
+              height={'34px'}
+              width={'100px'}
+              onClick={() => {
+                setSelectorOpen(false);
+              }}
+            />
+          </div>
+        </>
+      )}
+  </>
+  );
+};
