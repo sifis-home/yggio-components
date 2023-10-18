@@ -1,10 +1,3 @@
-/*
- * Copyright 2022 Sensative AB
- * 
- * This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at https://mozilla.org/MPL/2.0/.
- */
 import React from 'react';
 import _ from 'lodash';
 
@@ -40,9 +33,7 @@ const Options = (props: Props) => {
           value: key,
           label: period.name,
         })), {label: 'Custom', value: 'custom'}]}
-        onChange={(evt: React.ChangeEvent<HTMLInputElement>) => (
-          props.form.setInputValue('timePeriod', evt.target.value)
-        )}
+        onChange={evt => props.form.setInputValue('timePeriod', evt.target.value)}
         value={props.form.formInputs.timePeriod.value as string}
         margin={'0 0 15px 0'}
         width={'300px'}
@@ -51,7 +42,7 @@ const Options = (props: Props) => {
         <>
           <DatePicker
             label={'From'}
-            onChange={(evt: React.ChangeEvent<HTMLInputElement>) => {
+            onChange={evt => {
               props.form.setInputValue('customFromTime', evt.target.value);
               props.form.showInputValidation('customFromTime');
             }}
@@ -64,7 +55,7 @@ const Options = (props: Props) => {
           />
           <DatePicker
             label={'To'}
-            onChange={(evt: React.ChangeEvent<HTMLInputElement>) => {
+            onChange={evt => {
               props.form.setInputValue('customToTime', evt.target.value);
               props.form.showInputValidation('customToTime');
             }}

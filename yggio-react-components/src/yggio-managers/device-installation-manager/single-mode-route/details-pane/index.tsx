@@ -1,31 +1,20 @@
-/*
- * Copyright 2022 Sensative AB
- * 
- * This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at https://mozilla.org/MPL/2.0/.
- */
 import React from 'react';
 import _ from 'lodash';
+import {useQueryClient} from '@tanstack/react-query';
 
 import {getValidationErrorMessage, isFormValid} from '../../../../utils/form-wizard';
-import {
-  useFetchLocationsQuery,
-  useFetchDeviceModelNamesQuery,
-  useCreateDeviceMutation,
-} from './queries';
-import {selectDeviceModelNameOptions} from './selectors';
+import {useFetchLocationsQuery, useCreateDeviceMutation} from './queries';
 import {onInputChange, onInputBlur} from '../events';
 import {Forms, UpdateLocationMutation} from '../types';
+import {TranslatorPreference} from '../../../../types';
 
 import TextField from '../../../../components/text-field';
 import TextArea from '../../../../components/text-area';
-import Select from '../../../../components/select';
 import LocationSelector from '../../../../yggio-connected-components/location-selector';
 import Button from '../../../../components/button';
 import InfoBox from '../../../../components/info-box';
 import InputDecorator from '../../../../components/input-decorator';
-import ContextualParametersEditor from '../../../../yggio-components/contexutal-parameters-editor';
+import ContextualParametersEditor from '../../../../yggio-connected-components/contextual-parameters-editor';
 import {
   Heading,
   SubHeading,
@@ -40,20 +29,21 @@ interface DetailsPaneProps {
   onBack: () => void;
   incrementCurrentStep: () => void;
   updateLocationMutation: UpdateLocationMutation;
+  translatorPreferences: TranslatorPreference[];
 }
 
 const ADDITIONAL_INFO = 'Contextual parameters are user-defined data that let you save any information you want to the device.';
 
 const DetailsPane = (props: DetailsPaneProps) => {
 
-  const fetchLocationsResult = useFetchLocationsQuery();
+  const queryClient = useQueryClient();
 
-  const fetchDeviceModelNamesResult = useFetchDeviceModelNamesQuery();
-  const deviceModelNamesOptions = selectDeviceModelNameOptions(fetchDeviceModelNamesResult.data);
+  const fetchLocationsResult = useFetchLocationsQuery();
 
   const createDeviceMutation = useCreateDeviceMutation(
     props.incrementCurrentStep,
     props.updateLocationMutation,
+    queryClient,
   );
 
   return (
@@ -70,12 +60,8 @@ const DetailsPane = (props: DetailsPaneProps) => {
           name={'name'}
           isRequired
           value={props.forms.details.formInputs.name.value as string}
-          onChange={(evt: React.ChangeEvent<HTMLInputElement>) => (
-            onInputChange(props.forms.details, evt)
-          )}
-          onBlur={(evt: React.ChangeEvent<HTMLInputElement>) => (
-            onInputBlur(props.forms.details, evt)
-          )}
+          onChange={evt => onInputChange(props.forms.details, evt)}
+          onBlur={evt => onInputBlur(props.forms.details, evt)}
           validationErrorMessage={getValidationErrorMessage(props.forms.details.formInputs.name)}
           fullHeight
           margin={'0 0 10px 0'}
@@ -84,31 +70,13 @@ const DetailsPane = (props: DetailsPaneProps) => {
           label={'Description'}
           name={'description'}
           value={props.forms.details.formInputs.description.value as string}
-          onChange={(evt: React.ChangeEvent<HTMLInputElement>) => (
-            onInputChange(props.forms.details, evt)
-          )}
-          onBlur={(evt: React.ChangeEvent<HTMLInputElement>) => (
-            onInputBlur(props.forms.details, evt)
-          )}
+          onChange={evt => onInputChange(props.forms.details, evt)}
+          onBlur={evt => onInputBlur(props.forms.details, evt)}
           validationErrorMessage={getValidationErrorMessage(
             props.forms.details.formInputs.description
           )}
           fullHeight
           margin={'0 0 10px 0'}
-        />
-        <Select
-          label={'Model name'}
-          name={'deviceModelName'}
-          placeholder={'Select model name...'}
-          additionalInfo={'Specify the model name of the device in order to get translated data'}
-          options={deviceModelNamesOptions}
-          value={props.forms.details.formInputs.deviceModelName.value as string}
-          onChange={(evt: React.ChangeEvent<HTMLInputElement>) => (
-            onInputChange(props.forms.details, evt)
-          )}
-          margin={'0 0 30px 0'}
-          isClearable
-          isSearchable
         />
         <LocationSelector
           locations={fetchLocationsResult.data}
@@ -136,7 +104,7 @@ const DetailsPane = (props: DetailsPaneProps) => {
           margin={'25px 0 3px 0'}
         />
         <ContextualParametersEditor
-          onChange={(parameters: {name: string, value: string}[]) => {
+          onChange={parameters => {
             const parametersObject = _.chain(parameters)
               .keyBy('name')
               .mapValues('value')
@@ -165,6 +133,7 @@ const DetailsPane = (props: DetailsPaneProps) => {
             if (isFormValid(props.forms.details.formInputs)) {
               createDeviceMutation.mutate({
                 forms: props.forms,
+                translatorPreferences: props.translatorPreferences,
                 locations: fetchLocationsResult.data,
               });
             }

@@ -1,13 +1,5 @@
-/*
- * Copyright 2022 Sensative AB
- * 
- * This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at https://mozilla.org/MPL/2.0/.
- */
 import React from 'react';
-import {Icon} from 'react-icons-kit';
-import {ic_dehaze as SidebarIcon} from 'react-icons-kit/md/ic_dehaze';
+import {MdOutlineMenu as SidebarIcon} from 'react-icons/md';
 
 import {SIDEBAR_SIBLING_MAX_WIDTH} from '../constants';
 import {
@@ -41,7 +33,7 @@ const HeadingBar = (props: Props) => {
             }
           }}
         >
-          <Icon icon={SidebarIcon as object} size={17} />
+          <SidebarIcon size={17} />
         </ToggleSidebarButton>
       </HeadingBarLeftSection>
       <HeadingBarMiddleSection>

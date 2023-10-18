@@ -1,10 +1,3 @@
-/*
- * Copyright 2022 Sensative AB
- * 
- * This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at https://mozilla.org/MPL/2.0/.
- */
 import styled from 'styled-components';
 
 import ContainerBox from '../../components/container-box';
@@ -14,8 +7,8 @@ const Heading = styled.h2`
   font-size: 23px;
   color: #222;
   margin: 50px 0 40px 0;
-  @media (max-width: 500px){
-    margin: 0 0 20px 0;
+  @media (max-width: 980px){
+    margin: 10px 0 10px 0;
   }
 `;
 
@@ -27,14 +20,14 @@ const CountBoxesWrapper = styled.div`
   display: flex;
   flex-wrap: wrap;
   justify-content: space-between;
+  gap: 10px 0;
+  margin: 0 0 15px 0;
 `;
 
 const CountBoxContainer = styled(ContainerBox)`
-  min-height: 100px;
   width: 200px;
   height: 80px;
   box-sizing: border-box;
-  margin-bottom: 10px;
   display: flex;
   align-items: center;
   cursor: pointer;
@@ -57,7 +50,9 @@ const CountBoxContainer = styled(ContainerBox)`
 
   h3 {
     font-size: 25px;
-    margin: 0 0 3px 0;
+    margin: 0;
+    padding: 0;
+    height: 32px;
   }
   h4 {
     font-size: 14px;
@@ -67,11 +62,6 @@ const CountBoxContainer = styled(ContainerBox)`
   }
 `;
 
-const IconContainer = styled.div`
-  padding: 0 20px 0 20px;
-  color: #3C7D44;
-`;
-
 const Version = styled.div`
   position: absolute;
   right: 5px;
@@ -79,13 +69,37 @@ const Version = styled.div`
   font-size: 0.6em;
 `;
 
+const MiddleContainer = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px 15px;
+  margin: 0 0 50px 0;
+`;
+
 const MapWrapper = styled.div`
-  margin: 5px 0 20px 0;
+  width: 600px;
+  min-height: 400px;
   border-radius: 5px;
   overflow: hidden;
-  width: 100%;
   box-shadow: 0px 0px 7px rgba(0, 0, 0, .1);
   border: 1px solid ${COLORS.greyAlt};
+  @media (max-width: 1235px) {
+    width: 100%;
+  }
+`;
+
+const LogsWrapper = styled.div`
+  width: 585px;
+  @media (max-width: 1235px) {
+    width: 100%;
+  }
+`;
+
+const LogsHeading = styled.p`
+  font-size: 14px;
+  margin: 0 0 12px 0;
+  font-weight: bold;
+  color: #666;
 `;
 
 export {
@@ -93,7 +107,9 @@ export {
   GreenText,
   CountBoxesWrapper,
   CountBoxContainer,
-  IconContainer,
   Version,
   MapWrapper,
+  MiddleContainer,
+  LogsWrapper,
+  LogsHeading,
 };

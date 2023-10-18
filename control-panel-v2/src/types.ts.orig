@@ -1,0 +1,61 @@
+import {JwtPayload} from 'jsonwebtoken';
+import type {NextApiRequest} from 'next';
+
+import {COLLECTION_NAMES, REQUEST_METHODS} from './constants';
+
+interface Theme {
+  _id: string;
+  ownerId: string;
+  orgId: string;
+  logo: {
+    data: string;
+    file: object;
+  };
+}
+
+interface RuleButton {
+  owner: string;
+  buttonName: string;
+  deviceName: string;
+  deviceId: string;
+}
+
+interface RuleButtonDeleteData {
+  ruleId: string;
+}
+
+interface Query {
+<<<<<<< HEAD
+=======
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  [x: string]: any; // what is this abomination?
+>>>>>>> 27d01a188a04d0ee868a606db6e26be1a020577a
+  _id: string;
+  orgId: string;
+  owner: string;
+  deviceId: string;
+  command: keyof typeof COLLECTION_NAMES;
+}
+
+interface CommandData {
+  user: JwtPayload['sub'] | (() => string); // Some legacy browser compatibility thing
+  data?: Theme | RuleButton | RuleButtonDeleteData;
+  _id?: string;
+  query: Query;
+  authToken: string;
+}
+
+interface CustomNextApiRequest<T extends object, U extends object> extends NextApiRequest {
+  query: U;
+  method: keyof typeof REQUEST_METHODS;
+  body: T;
+}
+
+export type {
+  CommandData,
+  Theme,
+  Query,
+  RuleButton,
+  RuleButtonDeleteData,
+  CustomNextApiRequest,
+};

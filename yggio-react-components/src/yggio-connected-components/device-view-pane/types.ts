@@ -1,16 +1,4 @@
-/*
- * Copyright 2022 Sensative AB
- * 
- * This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at https://mozilla.org/MPL/2.0/.
- */
-enum DataFilter {
-  values = 'values',
-  all = 'all',
-  lora = 'lora',
-  box2 = 'box2',
-}
+import {IconType} from 'react-icons';
 
 interface CalculatedValue {
   id: string;
@@ -49,12 +37,23 @@ interface QueueItem {
   fCnt?: string;
 }
 
-export {
-  DataFilter,
+interface TabItem {
+  name: string;
+  path: string;
+  width?: number;
+  icon: {
+    file: IconType;
+    size: number;
+    topPosition?: number;
+  }
+}
+
+export type {
   CalculatedValues,
   CalculatedValue,
   ChirpstackQueueResponse,
   NetmoreQueueResponse,
   GetQueueResponse,
   QueueItem,
+  TabItem,
 };

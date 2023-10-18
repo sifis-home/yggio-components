@@ -1,14 +1,8 @@
-/*
- * Copyright 2022 Sensative AB
- * 
- * This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at https://mozilla.org/MPL/2.0/.
- */
 import React, {useEffect} from 'react';
 import _ from 'lodash';
 import {useQueryClient, useMutation, UseMutationResult} from '@tanstack/react-query';
 import toast from 'react-hot-toast';
+import {useTranslation} from 'react-i18next';
 
 // Logic
 import {getRequestErrorMessage} from '../../../utils';
@@ -18,7 +12,7 @@ import {selectRules, selectLoraQueueItems} from '../selectors';
 import {getUserId} from '../../../api/token';
 import {LORA_SERVERS, CHIRP_STACK_COMMANDS} from '../constants';
 import {getFormValues, isFormValid, getValidationErrorMessage} from '../../../utils/form-wizard';
-import {Device, DeviceCommand, IdKeyedRules, Translate} from '../../../types';
+import {Device, DeviceCommand, IdKeyedRules} from '../../../types';
 import {GetQueueResponse} from '../types';
 import {
   createRulesActionsOptions,
@@ -54,6 +48,10 @@ import {
 
 // NOTE: This file really needs to be divided up
 
+/*
+  TODO: Refactor and put into a folder
+*/
+
 const RULES_ACTIONS = {
   turnOn: 'turnOn',
   turnOff: 'turnOff',
@@ -61,7 +59,6 @@ const RULES_ACTIONS = {
 
 interface LoRaControlProps {
   device: Device;
-  t: Translate;
 }
 
 const LoraControl = (props: LoRaControlProps) => {
@@ -74,7 +71,6 @@ const LoraControl = (props: LoRaControlProps) => {
   return (
     <LoRaControlContent
       device={props.device}
-      t={props.t}
       loraServer={loraServer}
     />
   );
@@ -82,7 +78,6 @@ const LoraControl = (props: LoRaControlProps) => {
 
 interface LoRaControlContentProps {
   device: Device;
-  t: Translate;
   loraServer: LORA_SERVERS;
 }
 
@@ -144,10 +139,7 @@ const LoRaControlContent = (props: LoRaControlContentProps) => {
       )}
 
       {props.loraServer === LORA_SERVERS.chirpStack && (
-        <CustomDownlink
-          device={props.device}
-          t={props.t}
-        />
+        <CustomDownlink device={props.device} />
       )}
 
     </>
@@ -187,7 +179,7 @@ const ChirpstackDownlink = (props: DownlinkFormProps) => {
         name={'data'}
         isRequired
         value={form.formInputs.data.value as string}
-        onChange={(evt: React.ChangeEvent<HTMLInputElement>) => {
+        onChange={evt => {
           form.setInputValue('data', evt.target.value);
           form.showInputValidation('data');
         }}
@@ -204,7 +196,7 @@ const ChirpstackDownlink = (props: DownlinkFormProps) => {
         name={'fPort'}
         isRequired
         value={form.formInputs.fPort.value as string}
-        onChange={(evt: React.ChangeEvent<HTMLInputElement>) => {
+        onChange={evt => {
           form.setInputValue('fPort', evt.target.value);
           form.showInputValidation('fPort');
         }}
@@ -219,9 +211,7 @@ const ChirpstackDownlink = (props: DownlinkFormProps) => {
         label={'Reference'}
         additionalInfo='Random reference (used on ack notification)'
         name={'reference'}
-        onChange={(evt: React.ChangeEvent<HTMLInputElement>) => (
-          form.setInputValue('reference', evt.target.value)
-        )}
+        onChange={evt => form.setInputValue('reference', evt.target.value)}
         value={form.formInputs.reference.value as string}
         margin={'0 0 10px 0'}
       />
@@ -252,9 +242,12 @@ const ChirpstackDownlink = (props: DownlinkFormProps) => {
 
 const NetmoreDownlink = (props: DownlinkFormProps) => {
   const form = useLocalState(netmoreDownlinkFormState);
+  const command = 'apiCall';
   const sendLoraDownlinkMutation = useMutation(
     async () => devicesRequests.sendCommand({
-      command: 'apiCall',
+      command,
+      integrationName: 'Netmore',
+      integrationCommand: command,
       iotnodeId: props.device._id,
       data: {
         callName: 'sendDownlink',
@@ -283,7 +276,7 @@ const NetmoreDownlink = (props: DownlinkFormProps) => {
         name={'data'}
         isRequired
         value={form.formInputs.payloadHex.value as string}
-        onChange={(evt: React.ChangeEvent<HTMLInputElement>) => {
+        onChange={evt => {
           form.setInputValue('payloadHex', evt.target.value);
           form.showInputValidation('payloadHex');
         }}
@@ -300,7 +293,7 @@ const NetmoreDownlink = (props: DownlinkFormProps) => {
         name={'fPort'}
         isRequired
         value={form.formInputs.fPort.value as string}
-        onChange={(evt: React.ChangeEvent<HTMLInputElement>) => {
+        onChange={evt => {
           form.setInputValue('fPort', evt.target.value);
           form.showInputValidation('fPort');
         }}
@@ -326,14 +319,18 @@ const NetmoreDownlink = (props: DownlinkFormProps) => {
 
 const ActilityThingparkDownlink = (props: DownlinkFormProps) => {
   const form = useLocalState(thingparkDownlinkFormState);
+  const command = 'apiCall';
   const sendLoraDownlinkMutation = useMutation(
     async () => devicesRequests.sendCommand({
-      command: 'apiCall',
+      command,
+      integrationName: 'ActilityThingpark',
+      integrationCommand: command,
       iotnodeId: props.device._id,
       data: {
         callName: 'downlinkMessages',
         callData: {
           devEUI: props.device.devEui,
+          iotnodeId: props.device._id,
           payload: {
             targetPorts: form.formInputs.targetPorts.value,
             payloadHex: form.formInputs.payloadHex.value,
@@ -363,7 +360,7 @@ const ActilityThingparkDownlink = (props: DownlinkFormProps) => {
         name={'data'}
         isRequired
         value={form.formInputs.payloadHex.value as string}
-        onChange={(evt: React.ChangeEvent<HTMLInputElement>) => {
+        onChange={evt => {
           form.setInputValue('payloadHex', evt.target.value);
           form.showInputValidation('payloadHex');
         }}
@@ -380,7 +377,7 @@ const ActilityThingparkDownlink = (props: DownlinkFormProps) => {
         name={'targetPorts'}
         isRequired
         value={form.formInputs.targetPorts.value as string}
-        onChange={(evt: React.ChangeEvent<HTMLInputElement>) => {
+        onChange={evt => {
           form.setInputValue('targetPorts', evt.target.value);
           form.showInputValidation('targetPorts');
         }}
@@ -516,10 +513,10 @@ const Queue = (props: QueueProps) => {
 
 interface CustomDownlinkProps {
   device: Device;
-  t: (key: string) => string;
 }
 
 const CustomDownlink = (props: CustomDownlinkProps) => {
+  const {t} = useTranslation();
 
   const ruleForm = useLocalState(rulesFormState);
 
@@ -560,13 +557,11 @@ const CustomDownlink = (props: CustomDownlinkProps) => {
       <FlexWrapper>
         <Select
           width={'250px'}
-          placeholder={_.capitalize(props.t('placeholders.select'))}
+          placeholder={_.capitalize(t('placeholders.select'))}
           name={'rulesAction'}
           options={createRulesActionsOptions(deviceRules)}
           value={ruleForm.formInputs.rulesAction.value as string}
-          onChange={(evt: React.ChangeEvent<HTMLInputElement>) => (
-            ruleForm.setInputValue('rulesAction', evt.target.value)
-          )}
+          onChange={evt => ruleForm.setInputValue('rulesAction', evt.target.value)}
         />
         <Button
           label={'Create'}
@@ -591,7 +586,7 @@ const CustomDownlink = (props: CustomDownlinkProps) => {
                 width={'150px'}
                 content={RULES_ACTIONS[rule as 'turnOn' | 'turnOff']}
                 onClick={() => {
-                  activateRuleMutation.mutate(ruleId);
+                  activateRuleMutation.mutate({ruleId, deviceId: props.device._id});
                 }}
               />
               <Button

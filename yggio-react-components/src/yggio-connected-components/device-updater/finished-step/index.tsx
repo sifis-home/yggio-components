@@ -1,13 +1,5 @@
-/*
- * Copyright 2022 Sensative AB
- * 
- * This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at https://mozilla.org/MPL/2.0/.
- */
 import React from 'react';
-import Icon from 'react-icons-kit';
-import {ic_check_circle_outline as checkCircleIcon} from 'react-icons-kit/md/ic_check_circle_outline';
+import {MdCheckCircle as CheckCircleIcon} from 'react-icons/md';
 
 import Button from '../../../components/button';
 import {FlexMaxWidthCenterWrapper} from '../../../global/styled';
@@ -24,7 +16,7 @@ const FinishedStep = (props: FinishedStepProps) => {
     <WizardStepContainer>
       <WizardContent>
         <Container>
-          <Icon icon={checkCircleIcon as object} size={90} />
+          <CheckCircleIcon size={90} />
         </Container>
         <SuccessMessage>Device was successfully updated</SuccessMessage>
         <FlexMaxWidthCenterWrapper>

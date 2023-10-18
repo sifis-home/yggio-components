@@ -1,17 +1,9 @@
-/*
- * Copyright 2022 Sensative AB
- * 
- * This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at https://mozilla.org/MPL/2.0/.
- */
 import {
   generateForm,
   inputValidators,
   VALIDATION_VISIBILITY_TYPES,
 } from '../../../../../utils/form-wizard';
 import {LORA_INPUTS} from '../../constants';
-import {DEVICE_PROFILES_OPTIONS} from '../../lora-pane/constants';
 import {InputValue} from '../../../../../types';
 import {ConnectorInputValue} from '../../types';
 
@@ -132,6 +124,18 @@ const formConfig = {
       ],
     }
   },
+  [LORA_INPUTS.netmoreLorawanVersion.name]: {
+    defaultValue: 'V103@SENSOR_COMMON',
+    validation: {
+      visibilityType: VALIDATION_VISIBILITY_TYPES.always,
+    }
+  },
+  [LORA_INPUTS.thingParkLorawanVersion.name]: {
+    defaultValue: '1.0.3',
+    validation: {
+      visibilityType: VALIDATION_VISIBILITY_TYPES.always,
+    }
+  },
   [LORA_INPUTS.externalJoinServer.name]: {
     defaultValue: 'no',
     validation: {
@@ -176,13 +180,6 @@ const formConfig = {
       validators: [
         inputValidators.inputRequired('Please enter a connectivity plan'),
       ],
-    }
-  },
-  [LORA_INPUTS.deviceProfileId.name]: {
-    defaultValue: DEVICE_PROFILES_OPTIONS[0].value, // = class A
-    validation: {
-      visibilityType: VALIDATION_VISIBILITY_TYPES.optIn,
-      validators: [],
     }
   },
 };

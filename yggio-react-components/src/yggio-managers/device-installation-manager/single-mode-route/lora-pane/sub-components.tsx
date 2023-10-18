@@ -1,10 +1,3 @@
-/*
- * Copyright 2022 Sensative AB
- * 
- * This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at https://mozilla.org/MPL/2.0/.
- */
 import React from 'react';
 import _ from 'lodash';
 import {UseQueryResult} from '@tanstack/react-query';
@@ -16,8 +9,9 @@ import {
 import {
   ACTIVATION_TYPE_OPTIONS,
   CLASS_TYPE_OPTIONS,
+  NETMORE_LORAWAN_VERSION_OPTIONS,
+  THINGPARK_LORAWAN_VERSION_OPTIONS,
   EXTERNAL_JOIN_SERVER_OPTIONS,
-  DEVICE_PROFILES_OPTIONS,
 } from './constants';
 import {LORA_INPUTS} from '../constants';
 import {onInputChange, onInputChangeUpperCase, onInputBlur} from '../events';
@@ -51,9 +45,7 @@ const Inputs = (props: InputsProps) => {
           name={LORA_INPUTS.connector.name}
           margin={'0 0 15px 0'}
           additionalInfo={LORA_INPUTS.connector.info}
-          onChange={(evt: React.ChangeEvent<HTMLInputElement>) => (
-            onConnectorChange(props.connectorOptions, evt, props.form.setInputValue)
-          )}
+          onChange={evt => onConnectorChange(props.connectorOptions, evt, props.form.setInputValue)}
           validationErrorMessage={getValidationErrorMessage(
             props.form.formInputs[LORA_INPUTS.connector.name]
           )}
@@ -63,8 +55,9 @@ const Inputs = (props: InputsProps) => {
         <Select
           label={LORA_INPUTS.activationType.label}
           options={ACTIVATION_TYPE_OPTIONS}
-          onChange={(evt: React.ChangeEvent<HTMLInputElement>) => onInputChange(props.form, evt)}
+          onChange={evt => onInputChange(props.form, evt)}
           fullHeight
+          value={props.form.formInputs[LORA_INPUTS.activationType.name].value as string}
           name={LORA_INPUTS.activationType.name}
           margin={'0 0 15px 0'}
           additionalInfo={LORA_INPUTS.activationType.info}
@@ -77,10 +70,8 @@ const Inputs = (props: InputsProps) => {
         <TextField
           label={LORA_INPUTS.devEui.label}
           value={props.form.formInputs[LORA_INPUTS.devEui.name].value as string}
-          onChange={(evt: React.ChangeEvent<HTMLInputElement>) => (
-            onInputChangeUpperCase(props.form, evt)
-          )}
-          onBlur={(evt: React.ChangeEvent<HTMLInputElement>) => onInputBlur(props.form, evt)}
+          onChange={evt => onInputChangeUpperCase(props.form, evt)}
+          onBlur={evt => onInputBlur(props.form, evt)}
           name={LORA_INPUTS.devEui.name}
           fullHeight
           maxLength={16}
@@ -98,10 +89,8 @@ const Inputs = (props: InputsProps) => {
         <TextField
           label={LORA_INPUTS.appKey.label}
           value={props.form.formInputs[LORA_INPUTS.appKey.name].value as string}
-          onChange={(evt: React.ChangeEvent<HTMLInputElement>) => (
-            onInputChangeUpperCase(props.form, evt)
-          )}
-          onBlur={(evt: React.ChangeEvent<HTMLInputElement>) => onInputBlur(props.form, evt)}
+          onChange={evt => onInputChangeUpperCase(props.form, evt)}
+          onBlur={evt => onInputBlur(props.form, evt)}
           name={LORA_INPUTS.appKey.name}
           margin={'0 0 15px 0'}
           fullHeight
@@ -119,10 +108,8 @@ const Inputs = (props: InputsProps) => {
         <TextField
           label={LORA_INPUTS.appEui.label}
           value={props.form.formInputs[LORA_INPUTS.appEui.name].value as string}
-          onChange={(evt: React.ChangeEvent<HTMLInputElement>) => (
-            onInputChangeUpperCase(props.form, evt)
-          )}
-          onBlur={(evt: React.ChangeEvent<HTMLInputElement>) => onInputBlur(props.form, evt)}
+          onChange={evt => onInputChangeUpperCase(props.form, evt)}
+          onBlur={evt => onInputBlur(props.form, evt)}
           name={LORA_INPUTS.appEui.name}
           margin={'0 0 15px 0'}
           fullHeight
@@ -141,7 +128,7 @@ const Inputs = (props: InputsProps) => {
           label={LORA_INPUTS.classType.label}
           options={CLASS_TYPE_OPTIONS}
           value={props.form.formInputs[LORA_INPUTS.classType.name].value as string}
-          onChange={(evt: React.ChangeEvent<HTMLInputElement>) => onInputChange(props.form, evt)}
+          onChange={evt => onInputChange(props.form, evt)}
           fullHeight
           name={LORA_INPUTS.classType.name}
           margin={'0 0 15px 0'}
@@ -159,7 +146,7 @@ const Inputs = (props: InputsProps) => {
             label: model.name,
           }))}
           value={props.form.formInputs[LORA_INPUTS.priceModel.name].value as string}
-          onChange={(evt: React.ChangeEvent<HTMLInputElement>) => onInputChange(props.form, evt)}
+          onChange={evt => onInputChange(props.form, evt)}
           fullHeight
           placeholder={(() => {
             if (props.fetchPriceModelsResult.isLoading) return 'Fetching price models...';
@@ -172,6 +159,38 @@ const Inputs = (props: InputsProps) => {
           additionalInfo={LORA_INPUTS.priceModel.info}
           validationErrorMessage={getValidationErrorMessage(
             props.form.formInputs[LORA_INPUTS.priceModel.name]
+          )}
+        />
+      )}
+      {_.includes(props.activeLoraInputs, LORA_INPUTS.netmoreLorawanVersion.name) && (
+        <Select
+          label={LORA_INPUTS.netmoreLorawanVersion.label}
+          options={NETMORE_LORAWAN_VERSION_OPTIONS}
+          value={props.form.formInputs[LORA_INPUTS.netmoreLorawanVersion.name].value as string}
+          onChange={evt => onInputChange(props.form, evt)}
+          fullHeight
+          name={LORA_INPUTS.netmoreLorawanVersion.name}
+          margin={'0 0 15px 0'}
+          helperText='(!) Please make sure this is accurate as an incorrect version may cause problems.'
+          additionalInfo={LORA_INPUTS.netmoreLorawanVersion.info}
+          validationErrorMessage={getValidationErrorMessage(
+            props.form.formInputs[LORA_INPUTS.netmoreLorawanVersion.name]
+          )}
+        />
+      )}
+      {_.includes(props.activeLoraInputs, LORA_INPUTS.thingParkLorawanVersion.name) && (
+        <Select
+          label={LORA_INPUTS.thingParkLorawanVersion.label}
+          options={THINGPARK_LORAWAN_VERSION_OPTIONS}
+          value={props.form.formInputs[LORA_INPUTS.thingParkLorawanVersion.name].value as string}
+          onChange={evt => onInputChange(props.form, evt)}
+          fullHeight
+          name={LORA_INPUTS.thingParkLorawanVersion.name}
+          margin={'0 0 15px 0'}
+          additionalInfo={LORA_INPUTS.thingParkLorawanVersion.info}
+          helperText='(!) Please make sure this is accurate as an incorrect version may cause problems.'
+          validationErrorMessage={getValidationErrorMessage(
+            props.form.formInputs[LORA_INPUTS.thingParkLorawanVersion.name]
           )}
         />
       )}
@@ -191,10 +210,8 @@ const Inputs = (props: InputsProps) => {
         <TextField
           label={LORA_INPUTS.devAddr.label}
           value={props.form.formInputs[LORA_INPUTS.devAddr.name].value as string}
-          onChange={(evt: React.ChangeEvent<HTMLInputElement>) => (
-            onInputChangeUpperCase(props.form, evt)
-          )}
-          onBlur={(evt: React.ChangeEvent<HTMLInputElement>) => (
+          onChange={evt => onInputChangeUpperCase(props.form, evt)}
+          onBlur={evt => (
             onInputBlur(props.form, evt)
           )}
           name={LORA_INPUTS.devAddr.name}
@@ -214,10 +231,8 @@ const Inputs = (props: InputsProps) => {
         <TextField
           label={LORA_INPUTS.nwkSKey.label}
           value={props.form.formInputs[LORA_INPUTS.nwkSKey.name].value as string}
-          onChange={(evt: React.ChangeEvent<HTMLInputElement>) => (
-            onInputChangeUpperCase(props.form, evt)
-          )}
-          onBlur={(evt: React.ChangeEvent<HTMLInputElement>) => onInputBlur(props.form, evt)}
+          onChange={evt => onInputChangeUpperCase(props.form, evt)}
+          onBlur={evt => onInputBlur(props.form, evt)}
           name={LORA_INPUTS.nwkSKey.name}
           margin={'0 0 15px 0'}
           fullHeight
@@ -235,10 +250,8 @@ const Inputs = (props: InputsProps) => {
         <TextField
           label={LORA_INPUTS.appSKey.label}
           value={props.form.formInputs[LORA_INPUTS.appSKey.name].value as string}
-          onChange={(evt: React.ChangeEvent<HTMLInputElement>) => (
-            onInputChangeUpperCase(props.form, evt)
-          )}
-          onBlur={(evt: React.ChangeEvent<HTMLInputElement>) => onInputBlur(props.form, evt)}
+          onChange={evt => onInputChangeUpperCase(props.form, evt)}
+          onBlur={evt => onInputBlur(props.form, evt)}
           name={LORA_INPUTS.appSKey.name}
           margin={'0 0 15px 0'}
           fullHeight
@@ -260,8 +273,8 @@ const Inputs = (props: InputsProps) => {
             label: plan.name,
           }))}
           value={props.form.formInputs[LORA_INPUTS.connectivityPlan.name].value as string}
-          onChange={(evt: React.ChangeEvent<HTMLInputElement>) => onInputChange(props.form, evt)}
-          onBlur={(evt: React.ChangeEvent<HTMLInputElement>) => onInputBlur(props.form, evt)}
+          onChange={evt => onInputChange(props.form, evt)}
+          onBlur={evt => onInputBlur(props.form, evt)}
           name={LORA_INPUTS.connectivityPlan.name}
           margin={'0 0 15px 0'}
           fullHeight
@@ -279,18 +292,6 @@ const Inputs = (props: InputsProps) => {
           validationErrorMessage={getValidationErrorMessage(
             props.form.formInputs[LORA_INPUTS.connectivityPlan.name]
           )}
-        />
-      )}
-      {_.includes(props.activeLoraInputs, LORA_INPUTS.deviceProfileId.name) && (
-        <SegmentedControl
-          options={DEVICE_PROFILES_OPTIONS}
-          onChange={value => props.form.setInputValue('deviceProfileId', value as string)}
-          value={props.form.formInputs[LORA_INPUTS.deviceProfileId.name].value as string}
-          segmentWidth={140}
-          height={'30px'}
-          label={LORA_INPUTS.deviceProfileId.label}
-          additionalInfo={LORA_INPUTS.deviceProfileId.info}
-          margin={'0 0 25px 0'}
         />
       )}
     </>

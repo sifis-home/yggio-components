@@ -1,10 +1,3 @@
-/*
- * Copyright 2022 Sensative AB
- * 
- * This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at https://mozilla.org/MPL/2.0/.
- */
 import _ from 'lodash';
 import {compose} from 'lodash/fp';
 
@@ -69,7 +62,7 @@ const checkConnectorStatus = (props: CheckFunctionsProps) => {
     });
 
     if (props.device.vid && props.device.pid) {
-      const level = _.get(props.device, 'nodeInfo.commandClasses.0x0080.battery.level') as number | string;
+      const level = _.get(props.device, 'nodeInfo.commandClasses.0x0080.battery.level');
       if (level) {
         const levelText = level === '255' ? 'LOW' : `${level}%`;
         switch (true) {
@@ -165,12 +158,12 @@ const checkValueStatus = (props: CheckFunctionsProps) => {
     props.items.push({type: StatusTypeNames.ok, text: 'OK'});
   }
 
-  const presence = _.get(props.device, 'value.presence.value') as string;
+  const presence = _.get(props.device, 'value.presence.value');
   if (presence) {
     props.items.push({type: StatusTypeNames.error, text: props.t('deviceStatus.occupied')});
   }
 
-  const floodValue = _.get(props.device, 'value.flood.value') as string;
+  const floodValue = _.get(props.device, 'value.flood.value');
   if (_.gt(floodValue, 75)) {
     props.items.push({type: StatusTypeNames.error, text: props.t('deviceStatus.flooded')});
   }
@@ -213,6 +206,6 @@ const getDeviceStatus = (t: Translate, device?: Device, calculations?: IdKeyedCa
 };
 
 export default getDeviceStatus;
-export {
+export type {
   DeviceStatus,
 };

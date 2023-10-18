@@ -1,80 +1,113 @@
-/*
- * Copyright 2022 Sensative AB
- * 
- * This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at https://mozilla.org/MPL/2.0/.
- */
-import React from 'react';
+import React, {useState} from 'react';
 import _ from 'lodash';
-import {useQueryClient} from '@tanstack/react-query';
-
+import {useIsFetching} from '@tanstack/react-query';
 import {NextRouter} from 'next/router';
-import {
-  withLanguage,
-} from '../../hocs';
-import Navbar from '../../yggio-components/navbar';
+import {useTranslation} from 'react-i18next';
+
+import Logo from './sub-components/logo';
+import HorizontalMenu from './sub-components/horizontal-menu';
+import VerticalMenu from './sub-components/vertical-menu';
+import MenuButton from './sub-components/menu-button';
+import LanguageWidget from './sub-components/language-widget';
+import UserWidget from './sub-components/user-widget';
+import DocsWidget from './sub-components/docs-widget';
+import AlarmsWidget from './sub-components/alarms-widget';
+import Spinner from '../../components/spinner';
+import {userApi} from '../../api';
+import {DROPDOWN_NAMES} from './constants';
+import {COLORS} from '../../constants';
 import {
   NavbarParent,
   NavbarSibling,
+  Bar,
+  ContentWrapper,
+  Section,
 } from './styled';
-import {authApi, removeYggioToken, userApi} from '../../api';
-import {objectToQueryString} from '../../utils';
-import * as cookies from './utils';
 
-const links = [
-  {name: 'Dashboard', url: '/'},
-  {name: 'Devices', url: '/devices'},
-  // {name: 'Locations', url: '/locations'},
-  {name: 'Organizations', url: '/organizations'},
-  {name: 'Apps', url: '/apps'},
-];
+import type {DropdownName} from './types';
 
-interface NavbarProps extends React.PropsWithChildren {
+interface NavbarProps {
+  title?: string;
   router: NextRouter;
-  title: string;
-  centered: string;
-  contentWidth: string;
-  currentLanguage: string;
-  t(key: string): string;
-  changeLanguage(lang: string): void;
 }
 
-const BasicNavbarPane = (props: NavbarProps) => {
-  const queryClient = useQueryClient();
+const Navbar = (props: NavbarProps) => {
 
-  const authInfo = authApi.useGetAuthInfo();
-  const user = userApi.useTokenUser();
-  const {mutate: mutateUpdateUser} = userApi.useUpdateUser(queryClient);
+  const {i18n} = useTranslation();
+  document.documentElement.lang = i18n.language;
 
-  const signOut = () => {
-    removeYggioToken();
+  const [openedDropdown, setOpenedDropdown] = useState<DropdownName>();
 
-    cookies.removeAllCookies();
-    const [, pathname] = window.location.pathname.split('/');
-    const queryParams = {
-      // eslint-disable-next-line camelcase
-      redirect_uri: `${window.location.protocol}//${window.location.hostname}/${pathname}`,
-    };
-    const queryParamsString = objectToQueryString(queryParams);
-    window.location.href = `${authInfo.data?.signoutEndpoint}${queryParamsString}`;
-  };
+  const userQuery = userApi.useTokenUser();
 
+  const isFetching = useIsFetching();
+
+  const activeLink = `/${_.split(props.router.route, '/')[1]}`;
+
+  return (
+    <Bar>
+      <ContentWrapper>
+        <Section>
+          <Logo
+            title={props.title}
+            router={props.router}
+          />
+          <div style={{width: '30px'}}>
+            {!!isFetching && (
+              <Spinner color={COLORS.greyLight} size={16} />
+            )}
+          </div>
+          <HorizontalMenu
+            activeLink={activeLink}
+            router={props.router}
+          />
+        </Section>
+        <Section>
+          <MenuButton
+            openedDropdown={openedDropdown}
+            setOpenedDropdown={setOpenedDropdown}
+          />
+          {openedDropdown === DROPDOWN_NAMES.menu && (
+            <VerticalMenu
+              activeLink={activeLink}
+              router={props.router}
+            />
+          )}
+          <AlarmsWidget
+            router={props.router}
+          />
+          <DocsWidget
+            openedDropdown={openedDropdown}
+            setOpenedDropdown={setOpenedDropdown}
+          />
+          <LanguageWidget
+            user={userQuery.data}
+            openedDropdown={openedDropdown}
+            setOpenedDropdown={setOpenedDropdown}
+          />
+          <UserWidget
+            username={userQuery.data?.username}
+            openedDropdown={openedDropdown}
+            setOpenedDropdown={setOpenedDropdown}
+          />
+        </Section>
+      </ContentWrapper>
+    </Bar>
+  );
+};
+
+interface NavbarPaneProps {
+  title: string;
+  children: React.ReactNode;
+  router: NextRouter;
+}
+
+const NavbarPane = (props: NavbarPaneProps) => {
   return (
     <NavbarParent>
       <Navbar
-        links={links}
-        activeLink={`/${_.split(props.router.route, '/')[1]}`}
-        router={props.router}
-        user={user.data}
         title={props.title}
-        centered={props.centered}
-        contentWidth={props.contentWidth}
-        signOut={signOut}
-        t={props.t}
-        changeLanguage={props.changeLanguage}
-        currentLanguage={props.currentLanguage}
-        updateUser={mutateUpdateUser}
+        router={props.router}
       />
       <NavbarSibling>
         {props.children}
@@ -83,16 +116,4 @@ const BasicNavbarPane = (props: NavbarProps) => {
   );
 };
 
-export default withLanguage({
-  withTranslation: true,
-  withChangeLanguage: true,
-  withCurrentLanguage: true,
-})(BasicNavbarPane);
-
-export {
-  // basic
-  BasicNavbarPane,
-  // other relevant subcomponents
-  NavbarParent,
-  NavbarSibling,
-};
+export default NavbarPane;

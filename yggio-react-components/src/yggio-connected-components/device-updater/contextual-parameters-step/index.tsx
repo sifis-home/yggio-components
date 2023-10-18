@@ -1,15 +1,8 @@
-/*
- * Copyright 2022 Sensative AB
- * 
- * This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at https://mozilla.org/MPL/2.0/.
- */
 import React, {useState, useEffect} from 'react';
 import {useQueryClient, useMutation} from '@tanstack/react-query';
-import _, {Dictionary} from 'lodash';
+import _ from 'lodash';
 
-import {Device} from '../../../types';
+import {Device, Parameter} from '../../../types';
 import {devicesRequests} from '../../../api';
 import {
   WizardStepContainer,
@@ -17,7 +10,7 @@ import {
   WizardContent,
   WizardFooter,
 } from '../../../components/wizard';
-import ContextualParametersEditor from '../../../yggio-components/contexutal-parameters-editor';
+import ContextualParametersEditor from '../../contextual-parameters-editor';
 
 interface ContextualParametersStepProps {
   stepForward: () => void;
@@ -27,12 +20,12 @@ interface ContextualParametersStepProps {
 
 const ContextualParametersStep = (props: ContextualParametersStepProps) => {
 
-  const [contextMap, setContextMap] = useState<{name: string, value: string}[]>();
+  const [contextMap, setContextMap] = useState<Parameter[]>([]);
 
   const queryClient = useQueryClient();
 
   const updateDeviceMutation = useMutation(
-    async (contextMap: Dictionary<string>) => devicesRequests.update({
+    async (contextMap: Device['contextMap']) => devicesRequests.update({
       deviceId: props.device._id,
       updates: {contextMap}
     }),
@@ -57,7 +50,7 @@ const ContextualParametersStep = (props: ContextualParametersStepProps) => {
       <WizardContent>
         <ContextualParametersEditor
           value={contextMap}
-          onChange={(parameters: {name: string, value: string}[]) => {
+          onChange={parameters => {
             // handleUpdateDeviceContextMap(parameters);
             setContextMap(parameters);
           }}

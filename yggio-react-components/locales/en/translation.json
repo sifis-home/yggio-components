@@ -1,5 +1,6 @@
 {
   "common": {
+    "apps": "Apps",
     "name": "name",
     "device": "device",
     "devices": "devices",
@@ -22,9 +23,13 @@
     "setConnector": "Set connector",
     "id": "id",
     "user": "user",
-    "devEui": "devEui"
+    "devEui": "devEui",
+    "by": "by",
+    "help": "help",
+    "new": "new"
   },
   "labels": {
+    "weatherDeviceInfo": "Weather Device info",
     "finish": "finish",
     "submit": "submit",
     "key": "key",
@@ -32,6 +37,7 @@
     "send": "send",
     "filter": "filter",
     "newDevice": "new device",
+    "views": "views",
     "selectMany": "select many",
     "selectAll": "select all",
     "deselectAll": "deselect all",
@@ -70,7 +76,10 @@
     "apply": "apply",
     "customizeColumns": "Customize columns",
     "setConnector": "Set connector",
+    "tools": "Tools",
     "addColumn": "Add column",
+    "deleteColumn": "Delete column",
+    "columns": "columns",
     "selectPreset": "Select preset",
     "backToDeviceList": "Back to device list",
     "backToLocations": "Back to locations",
@@ -83,7 +92,25 @@
     "edit": "edit",
     "execute": "execute",
     "filterByName": "filter by name",
-    "filterByTags": "filter by tags"
+    "filterByTags": "filter by tags",
+    "versionAvailable": "version available",
+    "versionsAvailable": "versions available",
+    "addTranslator": "Add translator",
+    "addAnotherTranslator": "Add another translator",
+    "alreadyAdded": "Already added",
+    "addedTranslators": "Added translators",
+    "username": "Username",
+    "addUser": "Add user",
+    "exportAsString": "Export as string",
+    "exportToOrganization": "Export to organization",
+    "import": "Import",
+    "property": "property",
+    "comparison": "comparison",
+    "threshold": "threshold",
+    "color": "color",
+    "add": "add",
+    "reset": "reset",
+    "create": "create"
   },
   "titles": {
     "position": "position",
@@ -102,6 +129,7 @@
     "contextual-parameters": "Contextual parameters",
     "charts": "Charts",
     "report-interval": "Report interval",
+    "commands": "Commands",
     "lora-control": "LoRa control",
     "connectionOnline": "live updates offline",
     "connectionOffline": "offline",
@@ -126,9 +154,15 @@
     "tools": "tools",
     "measurement": "measurement",
     "translators": "translators",
-    "real-estate-core": "Real Estate Core"
+    "real-estate-core": "Real Estate Core",
+    "logs": "logs",
+    "applyViewPreset": "Apply view preset",
+    "deleteViewPreset": "Delete view preset",
+    "string": "string",
+    "organization": "organization"
   },
   "phrases": {
+    "weatherDeviceInformation": "Please enter Weather Device specific information",
     "welcomeToYour": "Welcome to your",
     "removeCalculationVerification": "Are you sure you want to remove this calculation?",
     "deleteDeviceVerification": "Are you sure you want to delete this device?",
@@ -169,7 +203,35 @@
     "calculationIntervalDisabled": "disabled for selected preset",
     "contextualParametersExplanation": "Contextual parameters are user-defined data that let you save any information you want to the device.",
     "translatorSelectorExplanation": "Translators can be rearanged and edited in preferable sequential order",
-    "invalidConfigurationDevices": "At least one of the devices selected is not a valid LoRa device"
+    "invalidConfigurationDevices": "At least one of the devices selected is not a valid LoRa device, or is not compatible with the other devices (two devices are different type of LoRa devices, e.g Netmore and ChirpStack)",
+    "matchWithDeviceModelName": "Match with device model name",
+    "cannotMatchWithDeviceModelName": "Cannot match with device model name since the device has none",
+    "noTranslatorsFound": "No translators found",
+    "selectATranslator": "Select a translator",
+    "noTranslatorsAdded": "No translators added",
+    "failedAccessRightCreation": "Failed to create access right",
+    "failedAccessRightRemoval": "Failed to remove access right",
+    "enterAccessUser": "Enter the username of the user you whish to give access to",
+    "saveViewsText": "Save current view preset including all your filters, columns, sorting and paging options",
+    "pleaseSelectOrg": "Please select an organization",
+    "pleaseSelectView": "Please select a view",
+    "viewNotFound": "View not found",
+    "errorDeletingView": "Error deleting view",
+    "applyingView": "Applying a view preset will replace all your device list settings",
+    "selectViewToApply": "Select a preset view to apply to the device list",
+    "successfullyRemovedViewPreset": "Successfully removed view preset",
+    "successfullySavedViewPreset": "Successfully saved view preset",
+    "selectViewToExport": "Select a view to export. You can export a view to an organization or as a string to be imported.",
+    "selectExportType": "Select export type",
+    "copyImportString": "Copy the string below and paste into import field",
+    "onlyOneExportATime": "A view can only be exported to one organization at a time.",
+    "selectOrganizationToExport": "Select an organization to export the view to",
+    "successfullyExportedViewToOrganization": "Successfully exported view preset to organization",
+    "pasteAString": "Paste a string to import a view. It will be saved to your view presets.",
+    "successfullyImportedView": "Successfully imported view",
+    "invalidImportString": "Invalid import string",
+    "somethingWentWrong": "Something went wrong, please contact Yggio support",
+    "columnDeleted": "Column successfully deleted"
   },
   "placeholders": {
     "search": "search",
@@ -184,7 +246,13 @@
     "groupBy": "Group by",
     "action": "Action",
     "preset": "Preset",
-    "deviceNameFilter": "Search device name..."
+    "deviceNameFilter": "Search device name...",
+    "newViewsName": "View name...",
+    "viewPresets": "View presets",
+    "selectOrganization": "Select organization",
+    "pasteStringHere": "Paste string here",
+    "columnName": "Name of your column...",
+    "columnField": "Property to display in column"
   },
   "deviceStatus": {
     "gatewayOffline": "Gateway offline",
@@ -240,7 +308,8 @@
     "moisture": "Moisture",
     "luminance": "Luminance",
     "illuminance": "Illuminance",
-    "presence": "Presence"
+    "presence": "Presence",
+    "calculations": "Calculation"
   },
   "pagination": {
     "items_per_page": "/ page",
@@ -269,6 +338,11 @@
     "spreadingFactor": "Spreading factor",
     "expectedReportInterval": "Expected report interval",
     "owned": "Owned",
-    "actions": "Actions"
+    "actions": "Actions",
+    "deviceModelName": "Device model name",
+    "commandButtons": "Command buttons"
+  },
+  "map": {
+    "autoZoom": "Automatic zoom"
   }
 }

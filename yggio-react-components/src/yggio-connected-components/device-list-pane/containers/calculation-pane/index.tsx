@@ -1,25 +1,15 @@
-/*
- * Copyright 2022 Sensative AB
- * 
- * This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at https://mozilla.org/MPL/2.0/.
- */
 import _ from 'lodash';
 import React from 'react';
-import Icon from 'react-icons-kit';
-import {calculator} from 'react-icons-kit/icomoon/calculator';
-import {infoCircle} from 'react-icons-kit/fa/infoCircle';
-import {useQueryClient} from '@tanstack/react-query';
-import {compose} from 'lodash/fp';
-import {NextRouter} from 'next/router';
+import {MdInfoOutline as InfoIcon} from 'react-icons/md';
+import {useQueryClient, useQueries} from '@tanstack/react-query';
 import {Flex} from '@chakra-ui/react';
+import {useTranslation} from 'react-i18next';
 
 import {Calculate, Calculation, Device, Devices, Interval} from '../../../../types';
-import selectors, {selectDevices} from './selectors';
+import selectors, {selectDevicePaths} from './selectors';
 import Button from '../../../../components/button';
 import Select from '../../../../components/select';
-import {withReselect, withLanguage} from '../../../../hocs';
+import {withReselect} from '../../../../hocs'; // TODO: This is depricated
 import {formState, navigationState} from './state';
 import TextField from '../../../../components/text-field';
 import {
@@ -36,8 +26,7 @@ import {
   StyledDatePicker,
 } from './styled';
 import StepProgressBar from '../../../../components/step-progress-bar';
-import RadioButton from '../../../../components/radio-button';
-import {isDisabledCreateCalculationButton, isDisabledDatePicker, buildSourcePath} from './utils';
+import {isDisabledDatePicker, buildSourcePath} from './utils';
 import {
   CALCULATION_DESCRIPTIONS,
   CALCULATION_SETTINGS,
@@ -46,7 +35,6 @@ import {
   CALCULATION_AUTOMATIC_UPDATE_TYPES,
 } from './constants';
 import {CALCULATION_NAMES} from '../../../../constants';
-import {useFetchDevices} from '../../queries';
 import {devicesApi, calculationsApi, devicesRequests} from '../../../../api';
 import {getFormValues} from '../../../../utils/form-wizard';
 import {useLocalState} from '../../../../hooks';
@@ -67,7 +55,6 @@ interface ProgressBarTitleProps {
 
 const ProgressBarTitle = (props: ProgressBarTitleProps) => (
   <>
-    <Icon size={16} icon={calculator as object} />
     &nbsp;
     {_.capitalize(props.t('titles.createCalculation'))}
     &nbsp;
@@ -80,17 +67,15 @@ const ProgressBarTitle = (props: ProgressBarTitleProps) => (
 interface CalculationPaneProps {
   selectedDevices: string[];
   devices: Devices;
-  router: NextRouter;
-  devicePaths: {
-    value: string;
-    label: string;
-  }[];
-
-  t(key: string): string;
-  setSelectMode(key: boolean): void;
+  setIsInSelectMode(key: boolean): void;
   setSelectedDevices(key: []): void;
   setPage(key: string): void;
 }
+
+type DevicePaths = {
+  value: string;
+  label: string;
+}[];
 
 interface Source {
   sourceId: string;
@@ -99,32 +84,32 @@ interface Source {
 }
 
 const BasicCalculationPane = (props: CalculationPaneProps) => {
-  if (!_.size(props.selectedDevices)) {
-    return props.router.push('/devices');
-  }
-
   const queryClient = useQueryClient();
 
   const formData = useLocalState(formState);
   const navState = useLocalState(navigationState);
 
-  const destPath = formData.formInputs.destination.value;
-  const nameFilter = formData.formInputs.deviceNameFilter.value;
-  const matchPattern = {name: nameFilter};
-  const params = {
-    filter: {matchPattern},
-    key: 'calculations',
-  };
+  const {t} = useTranslation();
 
   React.useEffect(() => {
     formData.setInputValue('devices', props.devices);
   }, []);
 
+  const fieldsQueries = useQueries({
+    queries: _.map(props.selectedDevices, deviceId => ({
+      queryKey: ['statisticsFields', deviceId],
+      queryFn: async () => devicesRequests.getStatisticsFields(deviceId),
+      refetchOnWindowFocus: false,
+    }))
+  });
   const useCreateCalculation = calculationsApi.useCreateCalculation(queryClient);
   const useCreateDevice = devicesApi.useCreateDevice(queryClient);
   const useUpdateDevice = devicesApi.useUpdateDevice(queryClient);
-  const devicesResult = useFetchDevices({params});
-  const selectableDevices = selectDevices({devices: devicesResult?.data});
+  const devicePaths = selectDevicePaths({
+    selectedDevices: props.selectedDevices,
+    devices: props.devices,
+    fields: fieldsQueries,
+  }) as DevicePaths;
 
   //
   //
@@ -134,9 +119,14 @@ const BasicCalculationPane = (props: CalculationPaneProps) => {
 
   const createCalculation = async () => {
     const formValues = getFormValues(formData.formInputs);
-    const devices = _.pick(formValues.devices, props.selectedDevices) as Devices;
+    const devices = _.filter(formValues.devices as Devices, device => (
+      _.includes(props.selectedDevices, device._id)
+    ));
     const sources = _.map(devices, device => {
-      const path = buildSourcePath(formValues.devicePath, device, device.secret);
+      const path = buildSourcePath({
+        path: formValues.devicePath as string,
+        isGeneric: device.secret,
+      });
       if (path) {
         return ({
           sourceId: device._id,
@@ -155,9 +145,9 @@ const BasicCalculationPane = (props: CalculationPaneProps) => {
     // eslint-disable-next-line
     const interval: Interval = intervalData.from && intervalData.to
       ? intervalData
-      // FIXME:
-      // @ts-ignore - TS cant seem to read CALCULATIONS_SETTINGS properly as
-      // interval DOES exist in it but TS complains about it not existing there??
+    // FIXME:
+    // @ts-ignore - TS cant seem to read CALCULATIONS_SETTINGS properly as
+    // interval DOES exist in it but TS complains about it not existing there??
       : calcSettings.preset.interval;
     const automaticUpdate = formValues.automaticUpdate
       ? CALCULATION_AUTOMATIC_UPDATE_TYPES.event
@@ -175,16 +165,14 @@ const BasicCalculationPane = (props: CalculationPaneProps) => {
       sources: _.compact(sources) as Source[],
       destination: {
         mongoId: formValues.deviceSelection as string,
-        path: `calculations.${formValues.customDestinationPath || 'values'}`,
+        path: 'calculations',
       },
     };
 
-    if (destPath === 'createNewDevice') {
-      const result = await useCreateDevice.mutateAsync({
-        name: formValues.createDeviceName as string,
-      });
-      data.destination.mongoId = result._id;
-    }
+    const result = await useCreateDevice.mutateAsync({
+      name: formValues.createDeviceName as string,
+    });
+    data.destination.mongoId = result._id;
 
     if (formValues.automaticUpdate) {
       const setupAutoUpdate = async () => {
@@ -192,7 +180,8 @@ const BasicCalculationPane = (props: CalculationPaneProps) => {
         const soughtDevices = devicesRequests.seek({deviceItems});
         const updatedSources = _.map(data.sources, (source: Source) => {
           const device = _.find(soughtDevices, (device: Device) => (
-            device._id === source.sourceId) as Partial<Device>);
+            device._id === source.sourceId
+          )) as Partial<Device>;
           const rabbitRouting = (_.get(device, 'rabbitRouting.value') || []) as [];
           const updates = {
             rabbitRouting: {
@@ -214,7 +203,7 @@ const BasicCalculationPane = (props: CalculationPaneProps) => {
 
     // setPage needs to be executed before setSelectedDevices to avoid error
     props.setPage('default');
-    props.setSelectMode(false);
+    props.setIsInSelectMode(false);
     props.setSelectedDevices([]);
   };
 
@@ -230,7 +219,7 @@ const BasicCalculationPane = (props: CalculationPaneProps) => {
     <CalculationPaneWrapper>
       <CalculationProgressContainer>
         <StepProgressBar
-          title={<ProgressBarTitle t={props.t} selectedDevices={props.selectedDevices} />}
+          title={<ProgressBarTitle t={t} selectedDevices={props.selectedDevices} />}
           steps={_.map(steps, 'progressBarTitle')}
           currentStep={navState.currentStep + 1}
           margin={'0 0 9px 0'}
@@ -242,9 +231,9 @@ const BasicCalculationPane = (props: CalculationPaneProps) => {
           [STEPS.calculationName.name]: (
             <>
               <CalculationParagraph>
-                <b>{_.capitalize(props.t('titles.description'))}</b>
+                <b>{_.capitalize(t('titles.description'))}</b>
                 <CreateCalculationText>
-                  &nbsp;- {props.t('phrases.calculationDescription')}
+                  &nbsp;- {t('phrases.calculationDescription')}
                 </CreateCalculationText>
               </CalculationParagraph>
               <TextField
@@ -253,7 +242,7 @@ const BasicCalculationPane = (props: CalculationPaneProps) => {
                   formData.formInputs.name.value as keyof typeof CALCULATION_NAMES
                 ]}
                 onChange={onChangeCalculation}
-                placeholder={props.t('placeholders.calculationName')}
+                placeholder={t('placeholders.calculationName')}
                 margin={'0 10px 20px 0'}
                 maxLength={30}
               />
@@ -266,7 +255,7 @@ const BasicCalculationPane = (props: CalculationPaneProps) => {
                 <Button
                   disabled={!_.get(formData.formInputs, 'name.validation.isValid')}
                   color={'green'}
-                  content={_.capitalize(props.t('labels.continue'))}
+                  content={_.capitalize(t('labels.continue'))}
                   onClick={navState.incrementCurrentStep}
                 />
               </CreateCalculationButtonContainer>
@@ -275,34 +264,34 @@ const BasicCalculationPane = (props: CalculationPaneProps) => {
           [STEPS.calculationSource.name]: (
             <>
               <CreateCalculationDescription>
-                {props.t('phrases.sourcePathDescription')}
+                {t('phrases.sourcePathDescription')}
               </CreateCalculationDescription>
               <CalculationParagraph>
-                <b>{props.t('titles.sourcePath')}</b>
+                <b>{t('titles.sourcePath')}</b>
                 <CreateCalculationText>
-                  &nbsp;- {props.t('phrases.sourcePathText')}
+                  &nbsp;- {t('phrases.sourcePathText')}
                 </CreateCalculationText>
               </CalculationParagraph>
               <Select
                 isClearable
                 width={'100%'}
                 name={'devicePath'}
-                placeholder={props.t('placeholders.devicePaths')}
-                options={props.devicePaths}
+                placeholder={t('placeholders.devicePaths')}
+                options={devicePaths}
                 margin={'0 10px 20px 0'}
                 value={formData.formInputs.devicePath.value as string}
                 onChange={onChangeCalculation}
               />
               <CreateCalculationButtonContainer>
                 <Button
-                  content={_.capitalize(props.t('labels.back'))}
+                  content={_.capitalize(t('labels.back'))}
                   ghosted
                   onClick={navState.decrementCurrentStep}
                 />
                 <Button
                   disabled={!_.get(formData.formInputs, 'devicePath.validation.isValid')}
                   color={'green'}
-                  content={_.capitalize(props.t('labels.continue'))}
+                  content={_.capitalize(t('labels.continue'))}
                   onClick={navState.incrementCurrentStep}
                 />
               </CreateCalculationButtonContainer>
@@ -311,11 +300,11 @@ const BasicCalculationPane = (props: CalculationPaneProps) => {
           [STEPS.calculationSetting.name]: (
             <>
               <CreateCalculationDescription>
-                {props.t('phrases.createCalculationDescription')}&nbsp;
-                {props.t('phrases.calculationSettingDescription')}
+                {t('phrases.createCalculationDescription')}&nbsp;
+                {t('phrases.calculationSettingDescription')}
               </CreateCalculationDescription>
               <CalculationParagraph>
-                <b>{props.t('titles.setting')}</b>
+                <b>{t('titles.setting')}</b>
                 <CreateCalculationText>
                   &nbsp;- The predetermined calculation setting
                 </CreateCalculationText>
@@ -323,11 +312,11 @@ const BasicCalculationPane = (props: CalculationPaneProps) => {
               <Select
                 isClearable
                 name={'preset'}
-                placeholder={props.t('placeholders.preset')}
+                placeholder={t('placeholders.preset')}
                 options={CALCULATION_PRESETS}
                 margin={'0 10px 20px 0'}
                 value={formData.formInputs.preset.value as string}
-                onChange={(evt: React.ChangeEvent<HTMLInputElement>) => {
+                onChange={evt => {
                   onChangeCalculation({
                     ...evt,
                     target: {...evt.target, value: evt.target.value, name: 'preset'},
@@ -340,7 +329,7 @@ const BasicCalculationPane = (props: CalculationPaneProps) => {
               />
 
               <CreateCalculationDescription>
-                {formData.formInputs.preset.value && <Icon icon={infoCircle as object} />}
+                {formData.formInputs.preset.value && <InfoIcon size={20} style={{marginRight: '4px'}} />}
                 {CALCULATION_DESCRIPTIONS[
                   formData.formInputs.preset.value as keyof typeof CALCULATION_DESCRIPTIONS
                 ]}
@@ -358,13 +347,9 @@ const BasicCalculationPane = (props: CalculationPaneProps) => {
 
               <CreateCalculationButtonContainer>
                 <Button
-                  content={_.capitalize(props.t('labels.cancel'))}
+                  content={_.capitalize(t('labels.cancel'))}
                   ghosted
-                  onClick={() => {
-                    props.setSelectMode(false);
-                    props.setSelectedDevices([]);
-                    props.setPage('default');
-                  }}
+                  onClick={() => props.setPage('default')}
                 />
                 <Button
                   disabled={!_.get(formData.formInputs, 'preset.validation.isValid')}
@@ -378,12 +363,12 @@ const BasicCalculationPane = (props: CalculationPaneProps) => {
           [STEPS.calculationInterval.name]: (
             <>
               <CalculationParagraph>
-                <b>{props.t('titles.interval')}</b>
+                <b>{t('titles.interval')}</b>
                 <CreateCalculationText>
-                  &nbsp;- {props.t('phrases.calculationIntervalText')}
+                  &nbsp;- {t('phrases.calculationIntervalText')}
                   &nbsp; {
                     isDisabledDatePicker(formData.formInputs) && (
-                      `(${props.t('phrases.calculationIntervalDisabled')})`
+                      `(${t('phrases.calculationIntervalDisabled')})`
                     )
                   }
                 </CreateCalculationText>
@@ -405,28 +390,28 @@ const BasicCalculationPane = (props: CalculationPaneProps) => {
                     margin={'0 10px 0'}
                     disabled={isDisabledDatePicker(formData.formInputs) || !_.get(formData.formInputs, 'interval.value')}
                     name={'calculationTimePeriodFrom'}
-                    value={_.get(formData.formInputs, 'calculationTimePeriodFrom.value')}
+                    value={formData.formInputs.calculationTimePeriodFrom.value as string}
                     onChange={onChangeCalculation}
                   />
                   <StyledDatePicker
                     margin={'0 10px 0'}
                     disabled={isDisabledDatePicker(formData.formInputs) || !_.get(formData.formInputs, 'interval.value')}
                     name={'calculationTimePeriodTo'}
-                    value={_.get(formData.formInputs, 'calculationTimePeriodTo.value')}
+                    value={formData.formInputs.calculationTimePeriodFrom.value as string}
                     onChange={onChangeCalculation}
                   />
                 </CalculationIntervalContainer>
               </MarginFlexColWrapper>
               <CreateCalculationButtonContainer>
                 <Button
-                  content={_.capitalize(props.t('labels.back'))}
+                  content={_.capitalize(t('labels.back'))}
                   ghosted
                   onClick={navState.decrementCurrentStep}
                 />
                 <Button
                   disabled={!_.get(formData.formInputs, 'preset.value')}
                   color={'green'}
-                  content={_.capitalize(props.t('labels.continue'))}
+                  content={_.capitalize(t('labels.continue'))}
                   onClick={navState.incrementCurrentStep}
                 />
               </CreateCalculationButtonContainer>
@@ -435,111 +420,30 @@ const BasicCalculationPane = (props: CalculationPaneProps) => {
           [STEPS.calculationDevice.name]: (
             <>
               <CalculationParagraph>
-                <b>{props.t('titles.destination')}</b>
+                <b>{t('titles.deviceName')}</b>
                 <CreateCalculationText>
-                  &nbsp;- {props.t('phrases.calculationDestinationText')}
+                  &nbsp;- {t('phrases.calculatedDeviceName')}
                 </CreateCalculationText>
               </CalculationParagraph>
-              {/* @ts-ignore - don't understand why this triggers error */}
-              <Flex w='30%' justify='space-between'>
-                <Flex>
-                  <RadioButton
-                    isSelected={formData.formInputs.destination.value === 'createNewDevice'}
-                    onClick={() => formData.setInputValue('destination', 'createNewDevice')}
-                  />
-                  &nbsp;
-                  <CalculationSpan>{_.capitalize(props.t('labels.newDevice'))}</CalculationSpan>
-                </Flex>
-
-                <Flex>
-                  <RadioButton
-                    isSelected={formData.formInputs.destination.value === 'saveToDevice'}
-                    onClick={() => formData.setInputValue('destination', 'saveToDevice')}
-                  />
-                  &nbsp;
-                  <CalculationSpan>{_.capitalize(props.t('labels.existingDevice'))}</CalculationSpan>
-                </Flex>
-              </Flex>
-
-              {formData.formInputs.destination.value === 'saveToDevice' && (
-                <>
-                  <CreateCalculationDescription>
-                    {props.t('phrases.calculationDeviceSearchDescription')}
-                  </CreateCalculationDescription>
-
-                  <CalculationParagraph>
-                    <b>{props.t('titles.deviceSelection')}</b>
-                    <CreateCalculationText>
-                      &nbsp;- {props.t('phrases.calculationDeviceSearchText')}
-                    </CreateCalculationText>
-                  </CalculationParagraph>
-                  <TextField
-                    name={'deviceNameFilter'}
-                    value={formData.formInputs.deviceNameFilter.value as string}
-                    onChange={onChangeCalculation}
-                    placeholder={props.t('placeholders.deviceNameFilter')}
-                    margin={'0 10px 20px 0'}
-                    maxLength={50}
-                  />
-                  <Select
-                    name={'deviceSelection'}
-                    placeholder={props.t('placeholders.selectDevice')}
-                    options={selectableDevices}
-                    margin={'0 10px 20px 0'}
-                    value={formData.formInputs.deviceSelection.value as string}
-                    onChange={onChangeCalculation}
-                  />
-                </>
-              )}
-
-              {formData.formInputs.destination.value === 'createNewDevice' && (
-                <>
-                  <CalculationParagraph>
-                    <b>{props.t('titles.deviceName')}</b>
-                    <CreateCalculationText>
-                      &nbsp;- {props.t('phrases.calculatedDeviceName')}
-                    </CreateCalculationText>
-                  </CalculationParagraph>
-                  <TextField
-                    name={'createDeviceName'}
-                    value={formData.formInputs.createDeviceName.value as string}
-                    onChange={onChangeCalculation}
-                    placeholder={props.t('placeholders.newDeviceName')}
-                    margin={'0 10px 20px 0'}
-                    maxLength={50}
-                  />
-                </>
-              )}
-
-              {(formData.formInputs.destination.value === 'createNewDevice' || formData.formInputs.destination.value === 'saveToDevice') && (
-                <>
-                  <CalculationParagraph>
-                    <b>{props.t('titles.destinationPath')}</b>
-                    <CreateCalculationText>
-                      &nbsp;- {props.t('phrases.calculationDestinationPath')}
-                    </CreateCalculationText>
-                  </CalculationParagraph>
-                  <TextField
-                    isRequired
-                    name={'customDestinationPath'}
-                    value={formData.formInputs.customDestinationPath.value as string}
-                    onChange={onChangeCalculation}
-                    placeholder={props.t('placeholders.customDevicePath')}
-                    margin={'0 10px 20px 0'}
-                  />
-                </>
-              )}
+              <TextField
+                name={'createDeviceName'}
+                value={formData.formInputs.createDeviceName.value as string}
+                onChange={onChangeCalculation}
+                placeholder={t('placeholders.newDeviceName')}
+                margin={'0 10px 20px 0'}
+                maxLength={50}
+              />
               <CreateCalculationButtonContainer>
                 <Button
-                  content={_.capitalize(props.t('labels.back'))}
+                  content={_.capitalize(t('labels.back'))}
                   ghosted
                   onClick={navState.decrementCurrentStep}
                 />
                 <Button
                   color={'green'}
-                  disabled={isDisabledCreateCalculationButton(formData.formInputs)}
+                  disabled={!formData.formInputs.createDeviceName.value}
                   onClick={createCalculation}
-                  content={_.capitalize(props.t('labels.submit'))}
+                  content={_.capitalize(t('labels.submit'))}
                   width={'150px'}
                   margin={'10px'}
                 />
@@ -558,9 +462,6 @@ const BasicCalculationPane = (props: CalculationPaneProps) => {
   );
 };
 
-const CalculationPane = compose(
-  withReselect(selectors),
-  withLanguage()
-)(BasicCalculationPane);
+const CalculationPane = withReselect(selectors)(BasicCalculationPane);
 
 export default CalculationPane;

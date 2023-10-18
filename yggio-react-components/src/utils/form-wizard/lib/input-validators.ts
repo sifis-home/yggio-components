@@ -1,10 +1,3 @@
-/*
- * Copyright 2022 Sensative AB
- * 
- * This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at https://mozilla.org/MPL/2.0/.
- */
 import _ from 'lodash';
 
 import {InputValue} from '../../../types';
@@ -73,6 +66,19 @@ const numberBetween = (min: number, max: number) => ({
   message: `Must be a number between ${min}-${max}`,
 });
 
+const validJson = ({
+  validate: (value: InputValue) => {
+    try {
+      JSON.parse(value as string);
+      return true;
+    } catch (error) {
+      return false;
+    }
+  },
+  message: `Invlaid JSON`,
+});
+
+
 export default {
   inputRequired,
   nonEmptyTrimmedString,
@@ -82,4 +88,5 @@ export default {
   hexString,
   hexStringOfLength16,
   numberBetween,
+  validJson,
 };

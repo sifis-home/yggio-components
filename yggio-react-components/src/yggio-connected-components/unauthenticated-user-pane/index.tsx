@@ -1,35 +1,27 @@
-/*
- * Copyright 2022 Sensative AB
- * 
- * This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at https://mozilla.org/MPL/2.0/.
- */
 import _ from 'lodash';
-import {toast} from 'react-hot-toast';
-import {compose} from 'lodash/fp';
 import React from 'react';
 import cookie from 'js-cookie';
 import {NextRouter} from 'next/router';
+import {useTranslation} from 'react-i18next';
+import {Flex, Text} from '@chakra-ui/react';
 
-import {
-  withLanguage,
-} from '../../hocs';
+import LogoIcon from '../../components/logo';
+import YGGIO_LOGO from '../../assets/images/yggio-icon-animated.svg';
+import Button from '../../components/button';
 import LogoSpinner from '../../components/logo-spinner';
 import {
   Box,
   LoginContent,
 } from './styled';
 import {authApi, getYggioToken, setYggioToken} from '../../api';
-import {objectToQueryString} from '../../utils';
 import {COOKIE_OAUTH_STATE_KEY} from '../../constants';
+import {redirectUser} from './utils';
 
 const OAuthStateCookie = cookie.get(COOKIE_OAUTH_STATE_KEY);
 
 interface UnauthenticatedUserPaneProps {
   children: React.FC;
   router: NextRouter;
-  t(key: string): string;
 }
 
 interface OAuthStateProps {
@@ -38,7 +30,10 @@ interface OAuthStateProps {
 }
 
 const RawUnauthenticatedUserPane = (props: UnauthenticatedUserPaneProps) => {
-  let yggioToken = getYggioToken();
+  const yggioToken = getYggioToken();
+
+  const {t} = useTranslation();
+
   const queryParams = props.router.query;
   const oAuthState = JSON.parse(OAuthStateCookie || '{}') as OAuthStateProps;
 
@@ -48,14 +43,8 @@ const RawUnauthenticatedUserPane = (props: UnauthenticatedUserPaneProps) => {
     code: queryParams.code,
     yggioToken,
   });
-
   const authInfo = authApi.useGetAuthInfo();
-
   const fetchedToken = authCode.data?.token;
-
-  if (fetchedToken) {
-    yggioToken = fetchedToken;
-  }
 
   React.useEffect(() => {
     if (fetchedToken) {
@@ -63,76 +52,64 @@ const RawUnauthenticatedUserPane = (props: UnauthenticatedUserPaneProps) => {
     }
   }, [fetchedToken]);
 
-  const redirectUser = () => {
-    if (authInfo.data) {
 
-      const {
-        authorizationEndpoint,
-        clientId,
-        redirectURIs,
-        scope
-      } = authInfo.data;
-
-      const redirectionEndpoint = _.find(redirectURIs, _.method('includes', 'control-panel-v2'));
-      const state = _(24).times(() => _.sample('abcdefghijklmnoprstuvwxyzABCDEFGHIJKLMNOPRSTUVWXYZ1234567890½!"#¤%&/()=?¶¡@£$€¥{[]}-.,_:;¨^*~<>|')).join('');
-      const stateData = {
-        authorizationEndpoint,
-        clientId,
-        failUrl: `${window.location.origin}${window.location.pathname}`,
-        redirectionEndpoint,
-        scope,
-        state,
-        successUrl: `${window.location.origin}${window.location.pathname}`,
-      };
-      cookie.set(COOKIE_OAUTH_STATE_KEY, stateData);
-
-      const queryParams = {
-        // eslint-disable-next-line camelcase
-        client_id: clientId,
-        // eslint-disable-next-line camelcase
-        redirect_uri: redirectionEndpoint,
-        scope,
-        state,
-        // eslint-disable-next-line camelcase
-        response_type: 'code'
-      };
-
-      const queryParamsString = objectToQueryString(queryParams);
-
-      // Clear persistent states
-      localStorage.removeItem('yggio-devices-list-filter');
-      localStorage.removeItem('yggio-devices-list-ui');
-
-      window.location.replace(`${authorizationEndpoint}${queryParamsString}`);
-    } else {
-      toast.error('Error attempting authentication');
-    }
-  };
-
-  if (yggioToken) {
+  if (yggioToken || fetchedToken) {
     return props.children;
   }
 
-  if (!authInfo.isLoading) {
-    redirectUser();
+  if (!authInfo.isLoading && !queryParams.code) {
+    redirectUser({authInfoData: authInfo.data});
   }
 
-  return (
-    <Box>
-      <LoginContent>
-        {(authCode.isLoading || authInfo.isLoading) &&
+  if (_.every([
+    (!yggioToken || !fetchedToken),
+    (authCode.isLoading || authInfo.isLoading),
+    (!authInfo.isError && !authCode.isError),
+  ])) {
+    return (
+      <Box>
+        <LoginContent>
           <>
             <LogoSpinner />
-            {!authCode.isSuccess &&
-              <p>{props.t('phrases.connectingToYggio')}</p>}
-            {authCode.isSuccess &&
-              <p>{props.t('phrases.checkingCredentials')}</p>}
-          </>}
-      </LoginContent>
-    </Box>
+            {!authCode.isSuccess && (
+              <p>{t<string>('phrases.connectingToYggio')}</p>
+            )}
+            {authCode.isSuccess && (
+              <p>{t('phrases.checkingCredentials')}</p>
+            )}
+          </>
+        </LoginContent>
+      </Box>
+    );
+  }
+
+
+  return (
+    <Flex
+      h='60vh'
+      justify='center'
+      align='center'
+      flexDir='column'
+    >
+      <LogoIcon
+        src={YGGIO_LOGO}
+        alt={'Yggio'}
+        height={'200px'}
+        width={'200px'}
+        margin={'0 9px 0 0'}
+      />
+      <Text m='10px'>Something went wrong, please try again.</Text>
+      <Button
+        width='180px'
+        color='green'
+        onClick={() => {
+          void authInfo.refetch();
+          void authCode.refetch();
+        }}
+        content='Login'
+      />
+    </Flex>
   );
 };
 
-export default compose(
-  withLanguage(),
-)(RawUnauthenticatedUserPane);
+export default RawUnauthenticatedUserPane;

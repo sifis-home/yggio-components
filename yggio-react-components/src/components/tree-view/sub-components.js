@@ -1,17 +1,11 @@
-/*
- * Copyright 2022 Sensative AB
- * 
- * This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at https://mozilla.org/MPL/2.0/.
- */
 import _ from 'lodash';
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import {Icon} from 'react-icons-kit';
-import {angleRight as untoggledIcon} from 'react-icons-kit/fa/angleRight';
-import {angleDown as toggledIcon} from 'react-icons-kit/fa/angleDown';
+import {
+  MdOutlineToggleOff as ToggleOffIcon,
+  MdOutlineToggleOn as ToggleOnIcon,
+} from 'react-icons/md';
 
 import {
   HeaderBase, HeaderTitleName,
@@ -28,9 +22,11 @@ const HeaderToggleButton = props => {
     <HeaderToggleBase
       onClick={onClick}
     >
-      <Icon
-        icon={props.isToggled ? toggledIcon : untoggledIcon}
-      />
+      {props.isToggled ? (
+        <ToggleOnIcon size={18} />
+      ) : (
+        <ToggleOffIcon size={18} />
+      )}
     </HeaderToggleBase>
   );
 };

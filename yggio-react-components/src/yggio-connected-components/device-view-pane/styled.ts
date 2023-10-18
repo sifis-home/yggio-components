@@ -1,10 +1,3 @@
-/*
- * Copyright 2022 Sensative AB
- * 
- * This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at https://mozilla.org/MPL/2.0/.
- */
 import styled, {css} from 'styled-components';
 import {COLORS} from '../../constants';
 import {
@@ -80,7 +73,7 @@ const SidebarDeviceNameHeading = styled.p`
 `;
 
 const SidebarDeviceName = styled.p`
-  font-size: 18px;
+  font-size: 17px;
   font-weight: bold;
   margin: 0 0 20px 0;
   overflow-wrap: break-word;
@@ -113,7 +106,7 @@ const SidebarMenuItem = styled.div<SidebarMenuItemProps>`
   font-size: 14px;
   color: #333;
   cursor: pointer;
-  background: ${({active}) => (active ? '#E7F3EC' : 'none')};
+  background: ${({active}) => (active ? '#d1e8da' : 'none')};
 
   &:hover {
     ${({active}) => !active && css`
@@ -158,7 +151,7 @@ interface SidebarMenuItemNumberChipProps {
 
 const SidebarMenuItemNumberChip = styled.div<SidebarMenuItemNumberChipProps>`
   display: ${({hidden}) => (hidden ? 'none' : 'flex')};
-  background: ${({active}) => (active ? '#C4DDCE' : '#eee')};
+  background: ${({active}) => (active ? '#82b597' : '#eee')};
   align-items: center;
   justify-content: center;
   font-size: 11px;
@@ -170,13 +163,13 @@ const SidebarMenuItemNumberChip = styled.div<SidebarMenuItemNumberChipProps>`
 // GENERAL
 
 const InfoItem = styled.div`
-  margin: 0 0 15px 0;
+  margin: 0 0 20px 0;
 `;
 
 const InfoItemTop = styled.div`
   display: flex;
   align-items: center;
-  height: 30px;
+  height: 25px;
 `;
 
 const InfoItemTitle = styled.div`
@@ -189,10 +182,7 @@ const InfoItemTitle = styled.div`
 
 const InfoItemMiddle = styled.div`
   margin: 0 0 10px 0;
-  p {
-    font-size: 13px;
-    margin: 0;
-  }
+  font-size: 13px;
 `;
 
 const InfoItemBottom = styled.div`
@@ -202,158 +192,6 @@ const InfoItemBottom = styled.div`
 const InfoItemGreyText = styled.p`
   color: #777;
   font-style: italic;
-`;
-
-// SPECIFICATIONS
-
-const SpecSection = styled.div`
-  margin: 0 0 40px 0;
-`;
-
-const SpecHeading = styled.div`
-  padding: 0 0 8px 0;
-  display: flex;
-  align-items: center;
-  color: #333;
-  border-bottom: 1px solid #ccc;
-  margin: 0 0 10px 0;
-  p {
-    margin: 0;
-  }
-`;
-
-// POSITION
-
-const MapWrapper = styled.div`
-  margin: 5px 0 20px 0;
-  border-radius: 5px;
-  overflow: hidden;
-  width: 100%;
-  box-shadow: 0px 0px 7px rgba(0, 0, 0, .1);
-  border: 1px solid ${COLORS.greyAlt};
-`;
-
-// CHARTS
-
-const AdvancedChartLink = styled.p`
-  margin: 0;
-  font-size: 14px;
-  color: #1850b5;
-  text-align: right;
-  cursor: pointer;
-  text-decoration: underline;
-  &:hover {
-    color: #002b78;
-  }
-`;
-
-// ACCESS RIGHTS
-
-const AccessRightsWrapper = styled(FlexColWrapper)`
-  box-sizing: border-box;
-  width: 100%;
-  padding: 10px;
-  margin: 10px;
-`;
-
-const AccessRightHeader = styled.div`
-  font-weight: bold;
-  font-size: 14px;
-  margin: 0 0 8px 0;
-`;
-
-const AccessRightsTable = styled.div`
-  display: flex;
-  flex-direction: column;
-  overflow-y: auto;
-  max-height: 600px;
-  margin: 10px 0 0 0;
-
-  @media (min-width: 1050px) {
-    width: 750px;
-  }
-`;
-
-interface AccessRightsColProps {
-  clickable?: boolean;
-  right?: boolean;
-}
-
-const AccessRightsCol = styled.div<AccessRightsColProps>`
-  cursor: ${({clickable}) => (clickable ? 'pointer' : 'default')};
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  font-size: 14px;
-  color: ${({right}) => {
-    if (!right) {
-      return COLORS.greyDark;
-    }
-
-    return COLORS.trueWhite;
-  }};
-  background: ${({right}) => {
-    if (!right) {
-      return COLORS.greyLight;
-    }
-    return '#428FD9';
-  }};
-  min-width: 50px;
-  width: 50px;
-  margin: 2px;
-  padding: 8px 4px;
-  transition: all 0.3s;
-
-  &:hover {
-    transition: all 0.3s;
-    background: ${({right, clickable}) => {
-    if (!clickable) {
-      return COLORS.greyLight;
-    }
-    return !right ? COLORS.grey : '#2067ab';
-  }}
-  }
-
-  @media (min-width: 1050px) {
-    min-width: 100px;
-    width: 100px;
-  }
-`;
-
-const AccessRightsRow = styled.div`
-  display: flex;
-  padding: 0 0;
-  width: 500px;
-
-  & ${AccessRightsCol}:first-child {
-    display: flex;
-    justify-content: flex-start;
-    min-width: 100px;
-    width: 100px;
-
-    @media (min-width:1050px)  {
-      min-width: 250px;
-      width: 250px;
-    }
-  }
-`;
-
-const AccessRightsUsernameSpinner = styled.div`
-  position: relative;
-  margin: auto;
-  margin: 0 0 0 5px;
-`;
-
-const AccessRightsNotFoundNote = styled.p`
-  margin: 5px 0 0 0;
-  font-size: 13px;
-  color: #bd1a1a;
-`;
-
-const AccessRightsFoundNote = styled.p`
-  margin: 5px 0 0 0;
-  font-size: 13px;
-  color: green;
 `;
 
 // CALCULATIONS
@@ -498,33 +336,11 @@ const LoraQueueTableItem = styled.div`
 
 // CHANNELS
 
-const DeleteChannelButton = styled.div`
-  cursor: pointer;
-  transition: color 0.2s;
-  color: ${COLORS.red};
-
-  &:hover {
-    transition: color 0.2s;
-    color: ${COLORS.redDark};
-  }
-`;
-
-// DATA
-
-const DataSetting = styled.div`
-  p {
-    margin: 0 0 5px 0;
-    font-size: 13px;
-  }
-`;
-
-const DataContainer = styled.div`
-  min-height: 200px;
-  max-height: 800px;
-  overflow-y: auto;
-  margin: 20px 0 10px 0;
-  background: #fafafa;
-  padding: 15px 10px;
+const ChannelContainer = styled.div`
+  background: #eee;
+  border-radius: 3px;
+  margin: 7px 0 0 0;
+  padding: 7px 0 12px 12px;
 `;
 
 const NoDataBox = styled.div`
@@ -544,17 +360,13 @@ const NoDataText = styled.p`
   font-style: italic;
 `;
 
-const ToolsContainer = styled.div`
+const ToolHeading = styled.p`
+  margin: 0 0 3px 0;
+`;
 
-  h4 {
-    margin: 0 0 3px 0;
-  }
-
-  p {
-   margin: 0;
-   font-size: 13px;
-   color: ${COLORS.greyDark};
-  }
+const ToolNote = styled.p`
+  font-size: 13px;
+  color: #333;
 `;
 
 const CalculationDataContainer = styled.div`
@@ -716,26 +528,6 @@ export {
   SidebarMenuItemIconWrapper,
   SidebarMenuItemNumberChip,
 
-  // SPECIFICATIONS
-  SpecSection,
-  SpecHeading,
-
-  // POSITION
-  MapWrapper,
-
-  // CHARTS
-  AdvancedChartLink,
-
-  // ACCESS RIGHTS
-  AccessRightsWrapper,
-  AccessRightHeader,
-  AccessRightsTable,
-  AccessRightsRow,
-  AccessRightsCol,
-  AccessRightsUsernameSpinner,
-  AccessRightsNotFoundNote,
-  AccessRightsFoundNote,
-
   // CALCUATIONS
   CalculationValues,
   CalculationValue,
@@ -760,13 +552,10 @@ export {
   LoraQueueTableItem,
 
   // CHANNELS
-  DeleteChannelButton,
+  ChannelContainer,
 
-  // DATA
-  DataSetting,
-  DataContainer,
-
-  ToolsContainer,
+  ToolHeading,
+  ToolNote,
 
   CalculationDataContainer,
   CalculationDataTable,

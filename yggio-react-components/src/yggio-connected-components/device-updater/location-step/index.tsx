@@ -1,15 +1,6 @@
-/*
- * Copyright 2022 Sensative AB
- * 
- * This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at https://mozilla.org/MPL/2.0/.
- */
 import React, {useState} from 'react';
 import {useQueryClient, useMutation} from '@tanstack/react-query';
 // import _ from 'lodash';
-// import {Icon} from 'react-icons-kit';
-// import {ic_clear as removeIcon} from 'react-icons-kit/md/ic_clear';
 
 // Logic
 import {locationsApi, locationsRequests} from '../../../api';

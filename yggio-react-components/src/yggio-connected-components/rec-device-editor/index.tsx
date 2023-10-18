@@ -1,10 +1,3 @@
-/*
- * Copyright 2022 Sensative AB
- * 
- * This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at https://mozilla.org/MPL/2.0/.
- */
 import React from 'react';
 import _ from 'lodash';
 import {useQueryClient} from '@tanstack/react-query';
@@ -35,7 +28,7 @@ const RecDeviceEditor = (props: Props) => {
 
   const selectedConnectorId = form.formInputs.connector.value as string;
 
-  const deviceRecDataQuery = devicesApi.useRecDataQuery(selectedConnectorId, props.deviceId);
+  const deviceRecDataQuery = devicesApi.useRecDataQuery(props.deviceId);
 
   const recDeviceId = deviceRecDataQuery.data?.deviceId;
 
@@ -57,7 +50,7 @@ const RecDeviceEditor = (props: Props) => {
   );
 
   const isProvisioned = !!deviceRecDataQuery.data;
-  const mountedRoomId = _.get(deviceRecDataQuery, 'data.isMountedInBuildingComponent["@id"]') as string;
+  const mountedRoomId = _.get(deviceRecDataQuery, 'data.isMountedInBuildingComponent["@id"]');
   const isMounted = !!mountedRoomId;
 
   const realEstatesQuery = devicesApi.useRecRealEstatesQuery(selectedConnectorId);
@@ -72,6 +65,20 @@ const RecDeviceEditor = (props: Props) => {
     storeysQuery.data,
     roomsQuery.data
   );
+
+  const mountQueriesAreLoading = _.some([
+    realEstatesQuery.isFetching,
+    buildingsQuery.isFetching,
+    storeysQuery.isFetching,
+    roomsQuery.isFetching
+  ]);
+
+  const mountQueriesDidFail = _.some([
+    realEstatesQuery.isError,
+    buildingsQuery.isError,
+    storeysQuery.isError,
+    roomsQuery.isError,
+  ]);
 
   const mountedData = selectRealEstateCorePopulateData(
     mountedRoomId,
@@ -88,11 +95,9 @@ const RecDeviceEditor = (props: Props) => {
         label={'Connector'}
         options={_.map(props.connectors, connector => ({
           value: connector._id,
-          label: connector.name,
+          label: connector.name || 'no-name',
         }))}
-        onChange={(evt: React.ChangeEvent<HTMLInputElement>) => {
-          form.setInputValue('connector', evt.target.value);
-        }}
+        onChange={evt => form.setInputValue('connector', evt.target.value)}
         value={selectedConnectorId}
         isClearable
         margin={'15px 0 15px 0'}
@@ -109,7 +114,9 @@ const RecDeviceEditor = (props: Props) => {
       {!!selectedConnectorId && !!isMounted && (
         <MountedSection
           mountedData={mountedData}
+          mountQueriesAreLoading={mountQueriesAreLoading}
           dismountRecDeviceMutation={dismountRecDeviceMutation}
+          mountQueriesDidFail={mountQueriesDidFail}
         />
       )}
 

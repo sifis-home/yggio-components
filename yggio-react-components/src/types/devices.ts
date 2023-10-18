@@ -1,10 +1,8 @@
-/*
- * Copyright 2022 Sensative AB
- * 
- * This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at https://mozilla.org/MPL/2.0/.
- */
+import z from 'zod';
+
+import {deviceSchema, translatorPreferenceUpgradePolicySchema, translatorPreferenceSchema} from '../schemas';
+
+
 interface FetchDevicesProps {
   lastItemOnPage?: string;
   limit?: number;
@@ -13,62 +11,21 @@ interface FetchDevicesProps {
   filter?: object;
 }
 
-interface Device {
-  _id: string;
-  mongoId?: string;
-  id?: string; // will probably be removed
-  name?: string;
-  description?: string;
-  owner?: string[];
-  rabbitRouting?: {
-    value: string[];
-  };
-  synchronizedAt?: string;
-  deviceModelName?: string;
-  expectedReportInterval?: number;
-  connector?: {
-    _id: string;
-    name: string;
-    downlinkQueue: string;
-  };
-  devEui?: string;
-  lat?: number;
-  lng?: number;
-  latlng?: number[];
-  value?: Record<string, unknown>;
-  downlinkQueue?: string;
-  secret?: string;
-  contextMap?: Record<string, string>;
-  mac?: string;
-  imei?: string;
-  joinAccept?: string;
-  reportedAt?: string;
-  tag?: string;
-  gatewayEui?: string;
-  vid?: string;
-  pid?: string;
-  rssi?: string;
-  snr?: string;
-  resourceName?: string;
-  acknowledged?: boolean;
-  appKey?: string;
-  appEUI?: string;
-  serialNumber?: string;
-  systemId?: string;
-  serviceProvider?: string;
-  username?: string;
-  nodeType?: string;
-  url?: string;
-  applicationId?: string;
-  organizationId?: string;
-  networkServerID?: string;
-  deviceProfileIdsABP?: string;
-  deviceProfileIdsOTAA?: string;
-}
+type TranslatorPreferenceUpgradePolicy = z.infer<typeof translatorPreferenceUpgradePolicySchema>;
+type TranslatorPreference = z.infer<typeof translatorPreferenceSchema>;
+type Device = z.infer<typeof deviceSchema>;
 
 type DeviceCreateData = Pick<Device,
 'name' | 'description' | 'deviceModelName' | 'secret' |
-'expectedReportInterval' | 'connector' | 'devEui' | 'contextMap'
+'expectedReportInterval' | 'connector' | 'devEui' | 'contextMap' |
+'apiKey' | 'host' | 'applicationId' | 'downlinkQueue' | 'username' |
+'url' | 'password' | 'networkServerID' | 'deviceProfileIdsABP' |
+'deviceProfileIdsOTAA' | 'organizationID' | 'serviceProvider' |
+'customerCode' | 'subscriber' | 'imei' |
+'manufacturer' | 'wMbusDeviceId' | 'encryptionKey' |
+'appKey' | 'clientKey' |
+'apiToken' | 'countryCode' | 'districtId' | 'translatorPreferences' | 'macAddress' |
+'apiURL'| 'siteName' | 'apiVersion' | 'gatewayEui'
 >;
 
 interface DeviceIdProps {
@@ -82,6 +39,7 @@ type IdKeyedDevices = Record<string, Device>;
 interface DeviceCommand {
   command: string;
   integrationName?: string;
+  integrationCommand?: string;
   iotnodeId?: string;
   data?: object;
 }
@@ -102,7 +60,7 @@ interface ActilityThingParkConnectivityPlan {
 
 type DeviceCommands = DeviceCommand[];
 
-export {
+export type {
   FetchDevicesProps,
   Device,
   DeviceCreateData,
@@ -113,4 +71,6 @@ export {
   NetmorePriceModel,
   ActilityThingParkConnectivityPlan,
   DeviceCommands,
+  TranslatorPreferenceUpgradePolicy,
+  TranslatorPreference,
 };

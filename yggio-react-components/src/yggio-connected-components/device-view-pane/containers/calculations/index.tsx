@@ -1,17 +1,10 @@
-/*
- * Copyright 2022 Sensative AB
- * 
- * This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at https://mozilla.org/MPL/2.0/.
- */
 import React from 'react';
 import _ from 'lodash';
 import {useQueryClient} from '@tanstack/react-query';
-import Icon from 'react-icons-kit';
 import {NextRouter} from 'next/router';
-import {trash} from 'react-icons-kit/fa/trash';
 import {format, parseISO} from 'date-fns';
+import {useTranslation} from 'react-i18next';
+import {FaTrash as TrashIcon} from 'react-icons/fa';
 
 import {
   FlexColMaxWidthWrapper,
@@ -26,7 +19,6 @@ import {
   CalculationDataTable,
   CalculationDataHeader,
   CalculationDataItem,
-  CalculationDataSubject,
   CalculationDataItemLink,
   NoDataBox,
 } from '../../styled';
@@ -36,7 +28,6 @@ import {
   CalculationValue,
   Device,
   Calculation,
-  Translate,
   Calculations,
 } from '../../../../types';
 import {
@@ -57,10 +48,10 @@ interface CalculateProps {
   device: Device;
   calculations?: IdKeyedCalculations;
   calculationsItems: Calculations;
-  t: Translate;
 }
 
 const Calculate = (props: CalculateProps) => {
+  const {t} = useTranslation();
 
   const queryClient = useQueryClient();
   const updateDeviceMutation = devicesApi.useUpdateDevice(queryClient);
@@ -113,7 +104,7 @@ const Calculate = (props: CalculateProps) => {
     <FlexColWrapper>
       <FlexWrapper>
         {_.isEmpty(selectableCalculations) && (
-          <NoDataBox>{props.t('phrases.noCalculationsAvailable')}</NoDataBox>
+          <NoDataBox>{t('phrases.noCalculationsAvailable')}</NoDataBox>
         )}
         {!_.isEmpty(selectableCalculations) && (
           <div>
@@ -122,7 +113,7 @@ const Calculate = (props: CalculateProps) => {
               name={'selectedCalculation'}
               options={selectableCalculations}
               value={selectedCalculation}
-              onChange={(evt: React.ChangeEvent<HTMLInputElement>) => (
+              onChange={evt => (
                 calculationForm.setInputValue('selectedCalculation', evt.target.value)
               )}
             />
@@ -137,7 +128,7 @@ const Calculate = (props: CalculateProps) => {
                 calculationForm.setInputValue('selectedCalculation', '');
               }}
             >
-              <Icon icon={trash as object} size={26} />
+              <TrashIcon size={26} />
             </CalculationRemovalContainer>
           )
         }
@@ -152,24 +143,25 @@ const Calculate = (props: CalculateProps) => {
               margin={'0 0 5px'}
             >
               <div>
-                <b>{_.capitalize(props.t('titles.description'))}:</b> {CALCULATION_NAMES[currentCalculation!.name as keyof typeof CALCULATION_NAMES]}
+                <b>{_.capitalize(t('titles.description'))}:</b> {CALCULATION_NAMES[currentCalculation!.name as keyof typeof CALCULATION_NAMES]}
               </div>
               <div>
-                <b>{_.capitalize(props.t('common.devices'))}:</b> {_.size(currentCalculation!.sources)}
+                <b>{_.capitalize(t('common.devices'))}:</b> {_.size(currentCalculation!.sources)}
               </div>
-              <div><b>{_.capitalize(props.t('titles.data'))}:</b></div>
+              <div><b>{_.capitalize(t('titles.data'))}:</b></div>
             </FlexColMaxWidthWrapper>
             <FlexColMaxWidthWrapper>
               {_.isEmpty(calculatedValues) && (
-                <NoDataBox>{props.t('phrases.noCalculatedValuesAvailable')}</NoDataBox>
+                <NoDataBox>{t('phrases.noCalculatedValuesAvailable')}</NoDataBox>
               )}
 
               {
                 !_.isEmpty(calculatedValues) && (
                   <CalculationData
-                    t={props.t}
+                    t={t}
                     router={props.router}
-                    calculatedValues={calculatedValues!}
+                    calculatedValues={calculatedValues}
+
                     currentCalculation={currentCalculation!}
                   />
                 )
@@ -203,7 +195,6 @@ const CalculationData = (props: CalculationDataProps) => {
     return (
       // @ts-ignore - don't understand why this triggers error
       <FlexMaxWidthWrapper padding={'10px 0 0'}>
-        <b>{_.map(_.keys(_.omit(props.calculatedValues, 'id')), key => <div key={key}>{key}:&nbsp;</div>)}</b>
         {_.map(_.omit(props.calculatedValues, 'id'), (val: number) => {
           if (_.isNumber(val)) {
             return (
@@ -230,9 +221,6 @@ const CalculationData = (props: CalculationDataProps) => {
     return (
       // @ts-ignore - don't understand why this triggers error
       <FlexColMaxWidthWrapper margin={'30px 0 0'}>
-        <CalculationDataSubject>
-          {_.map(_.keys(props.calculatedValues), key => <div key={key}>{key}</div>)}
-        </CalculationDataSubject>
         {
           _.map(_.omit(props.calculatedValues, 'id'), (val, i) => (
             <CalculationDataTable key={i}>
@@ -255,9 +243,9 @@ const CalculationData = (props: CalculationDataProps) => {
                   return (
                     <React.Fragment key={id}>
                       <CalculationDataItemLink
-                        onClick={() => void props.router.push(`/devices/${id}`)}
+                        onClick={async () => await props.router.push(`/devices/${id}`)}
                       >
-                        {_.truncate(_.get(_.get(props, `devices.${id}`), 'name', id) as string, {length: 16})}
+                        {_.truncate(_.get(_.get(props, `devices.${id}`), 'name', id), {length: 16})}
                       </CalculationDataItemLink>
                       <CalculationDataItem>{value.toFixed(2)}</CalculationDataItem>
                       <CalculationDataItem>{from && format(parseISO(from), 'yyyy-MM-dd')}</CalculationDataItem>
@@ -280,31 +268,43 @@ const CalculationData = (props: CalculationDataProps) => {
     return (
       // @ts-ignore - don't understand why this triggers error
       <FlexColMaxWidthWrapper margin={'30px 0 0'}>
-        <CalculationDataSubject>
-          {_.map(_.keys(props.calculatedValues), key => <div key={key}>{key}</div>)}
-        </CalculationDataSubject>
         {_.map(_.omit(props.calculatedValues, 'id'), (val, key) => (
           <CalculationDataTable key={key}>
             <CalculationDataHeader>Device</CalculationDataHeader>
             <CalculationDataHeader>Value</CalculationDataHeader>
             <CalculationDataHeader>From</CalculationDataHeader>
             <CalculationDataHeader>To</CalculationDataHeader>
-            {_.map(val, (curr, id: string) => {
-              if (_.isArray(curr)) {
-                return _.map(curr, ({value, from, to}: CalculatedValue, key) => (
-                  <React.Fragment key={key}>
+            {_.map(
+              val as unknown as {calculations: CalculatedValues},
+              (curr: CalculatedValue, id: string) => {
+                if (_.isPlainObject(curr)) {
+                  return <React.Fragment key={id}>
                     <CalculationDataItemLink
-                      onClick={() => void props.router.push(`/devices/${id}`)}
+                      onClick={async () => await props.router.push(`/devices/${id}`)}
                     >
-                      {_.truncate(_.get(_.get(props, `devices.${id}`), 'name', id) as string, {length: 16})}
+                      {_.truncate(_.get(_.get(props, `devices.${id}`), 'name', id), {length: 16})}
                     </CalculationDataItemLink>
-                    <CalculationDataItem>{value.toFixed(2)}</CalculationDataItem>
-                    <CalculationDataItem>{from && format(parseISO(from), 'yyyy-MM-dd')}</CalculationDataItem>
-                    <CalculationDataItem>{to && format(parseISO(to), 'yyyy-MM-dd')}</CalculationDataItem>
-                  </React.Fragment>
-                ));
+                    <CalculationDataItem>{curr.value.toFixed(2)}</CalculationDataItem>
+                    <CalculationDataItem>{curr.from && format(parseISO(curr.from), 'yyyy-MM-dd')}</CalculationDataItem>
+                    <CalculationDataItem>{curr.to && format(parseISO(curr.to), 'yyyy-MM-dd')}</CalculationDataItem>
+                  </React.Fragment>;
+                }
+                if (_.isArray(curr)) {
+                  return _.map(curr, ({value, from, to}: CalculatedValue, key) => (
+                    <React.Fragment key={key}>
+                      <CalculationDataItemLink
+                        onClick={async () => await props.router.push(`/devices/${id}`)}
+                      >
+                        {_.truncate(_.get(_.get(props, `devices.${id}`), 'name', id), {length: 16})}
+                      </CalculationDataItemLink>
+                      <CalculationDataItem>{value.toFixed(2)}</CalculationDataItem>
+                      <CalculationDataItem>{from && format(parseISO(from), 'yyyy-MM-dd')}</CalculationDataItem>
+                      <CalculationDataItem>{to && format(parseISO(to), 'yyyy-MM-dd')}</CalculationDataItem>
+                    </React.Fragment>
+                  ));
+                }
               }
-            })}
+            )}
           </CalculationDataTable>
         ))}
       </FlexColMaxWidthWrapper>
@@ -312,14 +312,9 @@ const CalculationData = (props: CalculationDataProps) => {
   }
 
   if (props.currentCalculation.type === CALCULATIONS_TYPES.monthlyDiffFromTotal) {
-    const calculatedValues = _.omit(props.calculatedValues, 'id');
-    const calculatedKeys = _.keys(calculatedValues);
     return (
       // @ts-ignore - don't understand why this triggers error
       <FlexColMaxWidthWrapper margin={'30px 0 0'}>
-        <CalculationDataSubject>
-          {_.map(calculatedKeys, key => <div key={key}>{key}</div>)}
-        </CalculationDataSubject>
         {_.map(_.omit(props.calculatedValues, 'id'), (val, key: string) => (
           // @ts-ignore - don't understand why this triggers error
           <CalculationDataTable key={key} columnSize={5}>
@@ -333,9 +328,9 @@ const CalculationData = (props: CalculationDataProps) => {
                 return _.map(curr, (v: CalculationValue) => (
                   <React.Fragment key={v.id}>
                     <CalculationDataItemLink
-                      onClick={() => void props.router.push(`/devices/${deviceId}`)}
+                      onClick={async () => await props.router.push(`/devices/${deviceId}`)}
                     >
-                      {_.truncate(_.get(_.get(props, `devices.${key}`), 'name', key) as string, {length: 16})}
+                      {_.truncate(_.get(_.get(props, `devices.${key}`), 'name', key), {length: 16})}
                     </CalculationDataItemLink>
                     <CalculationDataItem>{v.value.toFixed(2)}</CalculationDataItem>
                     <CalculationDataItem>{format(parseISO(v.date), 'yyyy-MM-dd hh:mm')}</CalculationDataItem>
@@ -345,12 +340,12 @@ const CalculationData = (props: CalculationDataProps) => {
                 ));
               }
               if (_.isPlainObject(curr)) {
-                const currentDevice = _.get(props, `devices.${key}`) as Device;
+                const currentDevice = _.get(props, `devices.${key}`);
                 const deviceName = _.get(currentDevice, 'name', key);
                 return (
                   <React.Fragment key={curr.id}>
                     <CalculationDataItemLink
-                      onClick={() => void props.router.push(`/devices/${deviceId}`)}
+                      onClick={async () => await props.router.push(`/devices/${deviceId}`)}
                     >
                       {_.truncate(deviceName, {length: 16})}
                     </CalculationDataItemLink>

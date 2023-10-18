@@ -1,13 +1,7 @@
-/*
- * Copyright 2022 Sensative AB
- * 
- * This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at https://mozilla.org/MPL/2.0/.
- */
 const RESOURCE_TYPES = {
-  // auth
+  accessRights: 'access-rights',
   auth: 'auth',
+  apps: 'apps',
   coreApps: 'coreapps',
   clientApps: 'client-apps',
   authUrl: 'auth/info', // SHOULD GO
@@ -24,7 +18,6 @@ const RESOURCE_TYPES = {
   organizations: 'organizations',
   version: 'version',
   requestBodySizeLimit: 'request-body-size-limit',
-  access: 'access',
   translators: 'translators',
   images: 'locations/images', // this one should probably have own route in rest-api
   jobs: 'jobs',
@@ -35,6 +28,11 @@ const RESOURCE_TYPES = {
   rulesConditions: 'rules/conditions',
   rules: 'rules/rules',
   commands: 'commands',
+  logs: 'logs',
+  basicCredentialsSets: 'basic-credentials-sets',
+  connectors: 'connectors',
 };
 
-export default RESOURCE_TYPES;
+export {
+  RESOURCE_TYPES,
+};

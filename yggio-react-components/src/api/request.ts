@@ -1,10 +1,3 @@
-/*
- * Copyright 2022 Sensative AB
- * 
- * This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at https://mozilla.org/MPL/2.0/.
- */
 import axios, {Method, AxiosRequestConfig, AxiosResponseHeaders, AxiosPromise} from 'axios';
 import Bottleneck from 'bottleneck';
 
@@ -16,6 +9,7 @@ interface RequestConfig {
   URI: string;
   data?: unknown;
   params?: unknown;
+  isNextAPI?: boolean;
 }
 
 interface BaseRequestResult<R> {
@@ -30,13 +24,16 @@ const DEFAULT_TIMEOUT: number = 15000;
 const baseRequest = async <R>(config: RequestConfig): Promise<BaseRequestResult<R>> => {
   try {
     const token = getYggioToken();
+    const url = config.isNextAPI
+      ? `//${getConfig().domain}/control-panel-v2/api/${config.URI}`
+      : `${getConfig().baseRequestUrl}/${config.URI}`;
 
     const requestConfig: AxiosRequestConfig = {
       headers: token ? {Authorization: `Bearer ${token}`} : undefined,
       timeout: DEFAULT_TIMEOUT,
       withCredentials: true,
       responseType: 'text', // Note: 'json' resulted in text responses not working
-      url: `${getConfig().baseRequestUrl}/${config.URI}`,
+      url,
       method: config.method,
       data: config.data,
       params: config.params,
@@ -47,11 +44,13 @@ const baseRequest = async <R>(config: RequestConfig): Promise<BaseRequestResult<
       body: result.data,
       headers: result.headers,
     };
-
   } catch (err) {
     if (axios.isAxiosError(err)) {
       if (err.response?.status === 401) {
         removeYggioToken();
+      }
+      if (err.response?.status === 409) {
+        throw err.response.data;
       }
       throw err;
     }

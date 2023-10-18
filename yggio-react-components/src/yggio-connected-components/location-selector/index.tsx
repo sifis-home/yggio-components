@@ -1,10 +1,3 @@
-/*
- * Copyright 2022 Sensative AB
- * 
- * This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at https://mozilla.org/MPL/2.0/.
- */
 import React from 'react';
 
 import {selectLocationOptions, selectBlueprintOptions} from './selectors';
@@ -30,7 +23,8 @@ const LocationSelector = (props: LocationSelectorProps) => {
         placeholder='Select location...'
         options={locationOptions}
         isClearable
-        onChange={(evt: React.ChangeEvent<HTMLInputElement>) => {
+        value={props.selectedLocation}
+        onChange={evt => {
           const location = evt.target.value;
           props.onChange(location, undefined);
         }}
@@ -39,11 +33,11 @@ const LocationSelector = (props: LocationSelectorProps) => {
         <Select
           placeholder='Select blueprint...'
           options={blueprintOptions}
-          onChange={(evt: React.ChangeEvent<HTMLInputElement>) => {
+          onChange={evt => {
             const blueprint = evt.target.value;
             props.onChange(props.selectedLocation, blueprint);
           }}
-          value={props.selectedBlueprint || null}
+          value={props.selectedBlueprint}
           isClearable
           margin={'4px 0 0 0'}
         />

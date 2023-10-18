@@ -1,10 +1,3 @@
-/*
- * Copyright 2022 Sensative AB
- * 
- * This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at https://mozilla.org/MPL/2.0/.
- */
 import styled from 'styled-components';
 
 const SidebarTitle = styled.p`
@@ -41,6 +34,7 @@ const RemoveButton = styled.div`
   border-radius: 14px;
   cursor: pointer;
   color: #333;
+  flex-shrink: 0;
   &:hover {
     background: #e5e5e5;
     color: black;
@@ -54,6 +48,9 @@ interface ListEntryTitleProps {
 const ListEntryTitle = styled.p<ListEntryTitleProps>`
   font-size: 14px;
   color: ${({redColor}) => (redColor ? 'red' : 'black')};
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 `;
 
 const NoSourceView = styled.div`
@@ -76,6 +73,57 @@ const NoSourceView = styled.div`
   }
 `;
 
+const SearchedDevicesContainer = styled.div`
+  margin: 0 0 20px 0;
+  box-shadow: 0px 0px 4px #ccc;
+  position: absolute;
+  background: white;
+  width: calc(100% - 40px);
+  box-sizing: border-box;
+  z-index: 1;
+`;
+
+const NoSearcedDevicesBox = styled.div`
+  width: 100%;
+  height: 40px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 13px;
+  color: #777;
+  padding: 0 3px 0 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-shadow: 0px 0px 4px #ccc;
+`;
+
+const SearchedDevice = styled.div`
+  display: flex;
+  align-items: center;
+  border: 1px solid #ccc;
+  border-top: none;
+  height: 40px;
+  width: 100%;
+  padding: 0 3px 0 8px;
+  font-size: 13px;
+  cursor: pointer;
+  &:first-child {
+    border-top: 1px solid #ccc;
+    border-radius: 4px 4px 0 0;
+  }
+  &:last-child {
+    border-radius: 0 0 4px 4px;
+  }
+  &:hover {
+    background: #f5f5f5;
+  }
+  p {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+`;
+
 export {
   SidebarSection,
   SidebarTitle,
@@ -83,4 +131,7 @@ export {
   ListEntryTitle,
   RemoveButton,
   NoSourceView,
+  SearchedDevicesContainer,
+  SearchedDevice,
+  NoSearcedDevicesBox,
 };

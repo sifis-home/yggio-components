@@ -1,10 +1,3 @@
-/*
- * Copyright 2022 Sensative AB
- * 
- * This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at https://mozilla.org/MPL/2.0/.
- */
 const BASE_COLORS = {
   greenRacing: '#004225',
   greenAlt: '#3C7D44',
@@ -13,18 +6,22 @@ const BASE_COLORS = {
   greenMedium: '#49AE68',
   greenDark: '#004C19',
   greenMatt: '#81A897',
+  green: 'green',
 
   red: '#ff3c3c',
+  redLight: '#ff7171',
   redAlt: '#ff282d',
   redDark: '#BC5252',
 
   yellow: '#CEBE2E',
+  yellowLight: '#fff177',
 
   black: '#111',
 
   greyDark: '#333',
   greyDarkAlt: '#555',
   greyMedium: '#888',
+  greyMedium2: '#777',
   grey: '#ccc',
   grey2: '#bbb',
   greyAlt: '#ddd',
@@ -44,6 +41,19 @@ const BASE_COLORS = {
 const COMPONENT_COLORS = {
   marker: '#5ac42b',
 };
-const COLORS = {...BASE_COLORS, ...COMPONENT_COLORS};
 
-export default COLORS;
+const THRESHOLD_COLORS = {
+  grafanaGreen: '#31a82d',
+  grafanaRed: '#e03435',
+  grafanaYellow: '#d77728',
+  grafanaBlue: '#3373d9',
+};
+const COLORS = {
+  ...BASE_COLORS,
+  ...COMPONENT_COLORS,
+  ...THRESHOLD_COLORS,
+};
+
+export {
+  COLORS,
+};

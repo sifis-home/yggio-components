@@ -1,10 +1,3 @@
-/*
- * Copyright 2022 Sensative AB
- * 
- * This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at https://mozilla.org/MPL/2.0/.
- */
 import _ from 'lodash';
 import {
   format,
@@ -142,7 +135,7 @@ const getAttributesFromPredefinedTimePeriod = (
 
   // Round end time to lower number of queries and rerenders
   const nowUnix = Math.round(Date.now() / 1000);
-  const endTime = nowUnix - (nowUnix % (60 * 5));
+  const endTime = nowUnix - (nowUnix % (60 * 1));
 
   const ticks = generateTicks(timePeriod.tickSettings, endTime);
 

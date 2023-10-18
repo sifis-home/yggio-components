@@ -1,10 +1,3 @@
-/*
- * Copyright 2022 Sensative AB
- * 
- * This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at https://mozilla.org/MPL/2.0/.
- */
 import React from 'react';
 import ReactTooltip from 'react-tooltip';
 import PropTypes from 'prop-types';
@@ -13,7 +6,7 @@ import Spinner from '../spinner';
 
 import {
   StyledButton,
-  resolveTextColor, StyledIcon
+  resolveTextColor,
 } from './styled';
 import {DEFAULT_TOOLTIP_PLACEMENT, DEFAULT_ICON_SIZE} from './constants';
 
@@ -23,20 +16,25 @@ const Button = props => {
     <>
       <StyledButton
         data-tip
-        icon={props.icon}
         data-for={randomId}
         hasStartedLoading={props.hasStartedLoading}
         {...props}
       >
-        {props.icon && (
-          <StyledIcon
-            size={props.iconSize || DEFAULT_ICON_SIZE}
-            icon={props.icon}
-            iconPosition={props.iconPosition}
-          />
+        {props.isLoading && <Spinner color={resolveTextColor(props)} size={18} />}
+        {!props.isLoading && (
+          <>
+            {props.icon && (
+              <props.icon
+                size={props.iconSize || DEFAULT_ICON_SIZE}
+                style={{
+                  marginRight: props.iconToLabelGap || 0,
+                  order: props.iconPosition === 'right' ? 1 : 0,
+                }}
+              />
+            )}
+            {props.label || props.content || props.children}
+          </>
         )}
-        {props.isLoading && <Spinner color={resolveTextColor(props)} />}
-        {!props.isLoading && (props.label || props.content || props.children)}
       </StyledButton>
       {!!props.tooltip &&
         <ReactTooltip
@@ -56,6 +54,8 @@ Button.propTypes = {
     PropTypes.string,
     PropTypes.object,
   ]),
+  title: PropTypes.string,
+  noBorder: PropTypes.bool,
   color: PropTypes.string,
   ghosted: PropTypes.bool,
   isLoading: PropTypes.bool,
@@ -74,6 +74,7 @@ Button.propTypes = {
   icon: PropTypes.object,
   iconSize: PropTypes.number,
   iconPosition: PropTypes.string,
+  iconToLabelGap: PropTypes.number,
 };
 
 export default Button;

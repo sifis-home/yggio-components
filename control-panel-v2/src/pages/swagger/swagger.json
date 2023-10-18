@@ -1,0 +1,369 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Control Panel V2 API Swagger Specification",
+    "description": "\n### Authentication\nTo authenticate yourself, do the following:\n1. Use the **POST /auth/local** endpoint. Include your username and password in the body.\n2. Save the **token value** you get in response and press the **Authorize button** and insert the token value.",
+    "version": "1.0"
+  },
+  "servers": [
+    {
+      "url": "http://dev.local.yggio/control-panel-v2/api/ui"
+    }
+  ],
+  "basePath": "/api/ui",
+  "schemes": [
+    "http",
+    "https"
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "security": [{
+    "bearerAuth": []
+  }],
+  "paths": {
+    "/auth/local": {
+      "post": {
+        "summary": "Returns JWT bearer token",
+        "description": "Login to the Yggio REST API, returns a token.",
+        "tags": [
+          "Auth"
+        ],
+        "requestBody": {
+          "name": "user credentials",
+          "description": "User credentials",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "username": {
+                    "type": "string"
+                  },
+                  "password": {
+                    "type": "string"
+                  }
+                },
+                "required": {
+                  "username": true,
+                  "password": true
+                }
+              }
+            }
+          }
+        },
+        "servers": [
+          {
+            "url": "http://dev.local.yggio/api"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully logged in",
+            "produces": "application/json",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "token": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/views": {
+      "get": {
+        "summary": "Returns views by user or organization",
+        "description": "List all views",
+        "tags": [
+          "Views"
+        ],
+        "parameters": [
+          {
+            "name": "type",
+            "in": "query",
+            "description": "Type of view",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "enum": ["deviceList"]
+            }
+          },
+          {
+            "name": "orgId",
+            "in": "query",
+            "description": "Organization ID",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully fetched all views",
+            "produces": "application/json",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "name": {
+                        "type": "string"
+                      },
+                      "_id": {
+                        "type": "string"
+                      },
+                      "orgId": {
+                        "type": "string"
+                      },
+                      "ownerId": {
+                        "type": "string"
+                      },
+                      "data": {
+                        "type": "object"
+                      }
+                    },
+                    "example": {
+                      "_id": "5e9f9b3b9c6f6b0017b0b3a0",
+                      "orgId": "5e9f9b3b9c6f6b0017b0b3a1",
+                      "ownerId": "5e9f9b3b9c6f6b0017b0b3a2",
+                      "name": "Test View",
+                      "data":  {
+                        "filterName": "test filter",
+                        "currentPage": 1
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Creates a new view",
+        "description": "Creates a new view",
+        "tags": [
+          "Views"
+        ],
+        "requestBody": {
+          "description": "View object",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "oneOf": [
+                  {
+                    "type": "object",
+                    "properties": {
+                      "name": {
+                        "type": "string"
+                      },
+                      "type": {
+                        "type": "string"
+                      },
+                      "data": {
+                        "type": "object"
+                      }
+                    },
+                    "example": {
+                      "name": "Test View",
+                      "type": "deviceList",
+                      "data":  {
+                        "filterName": "test filter",
+                        "currentPage": 1
+                      }
+                    }
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "name": {
+                        "type": "string"
+                      },
+                      "type": {
+                        "type": "string"
+                      },
+                      "orgId": {
+                        "type": "string"
+                      },
+                      "data": {
+                        "type": "object"
+                      }
+                    },
+                    "example": {
+                      "orgId": "5e9f9b3b9c6f6b0017b0b3a1",
+                      "type": "deviceList",
+                      "name": "Test View",
+                      "data":  {
+                        "filterName": "test filter",
+                        "currentPage": 1
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successfully created a view",
+            "produces": "application/json",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "name": {
+                        "type": "string"
+                      },
+                      "_id": {
+                        "type": "string"
+                      },
+                      "orgId": {
+                        "type": "string"
+                      },
+                      "ownerId": {
+                        "type": "string"
+                      },
+                      "data": {
+                        "type": "object"
+                      }
+                    },
+                    "example": {
+                      "_id": "5e9f9b3b9c6f6b0017b0b3a0",
+                      "orgId": "5e9f9b3b9c6f6b0017b0b3a1",
+                      "ownerId": "5e9f9b3b9c6f6b0017b0b3a2",
+                      "name": "Test View",
+                      "data":  {
+                        "filterName": "test filter",
+                        "currentPage": 1
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/views/{id}": {
+      "put": {
+        "summary": "Updates an existing view",
+        "description": "Updates an existing view",
+        "tags": [
+          "Views"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "View MongoDB Object ID",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "View object",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "type": {
+                    "type": "string"
+                  },
+                  "orgId": {
+                    "type": "string"
+                  },
+                  "data": {
+                    "type": "object"
+                  }
+                },
+                "example": {
+                  "orgId": "5e9f9b3b9c6f6b0017b0b3a1",
+                  "type": "deviceList",
+                  "name": "Test View",
+                  "data":  {
+                    "filterName": "test filter",
+                    "currentPage": 1
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Successfully updated a view"
+          },
+          "404": {
+            "description": "View does not exist"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Deletes an existing view",
+        "description": "Deletes an existing view",
+        "tags": [
+          "Views"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "View ID",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully deletes view"
+          },
+          "404": {
+            "description": "View does not exist"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "in": "header",
+        "name": "Authorization",
+        "scheme": "bearer",
+        "description": "Insert the token value recieved from a login (a POST with username and password to to /auth/local). Do **not** use Bearer here"
+      }
+    }
+  }
+}

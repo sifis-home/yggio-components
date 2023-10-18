@@ -1,10 +1,3 @@
-/*
- * Copyright 2022 Sensative AB
- * 
- * This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at https://mozilla.org/MPL/2.0/.
- */
 import {request} from './request';
 
 import {userApi, userRequests} from './user';
@@ -21,10 +14,15 @@ import {authApi, authRequests} from './auth';
 import {clientAppsApi, clientAppsRequests} from './client-apps';
 import {requestBodySizeLimitRequests, requestBodySizeLimitApi} from './request-body-size-limit';
 import {jobApi, jobRequests} from './jobs';
+import {logsRequests, logsTypes} from './logs';
+import {connectorsRequests} from './connectors';
 
 import {getYggioToken, setYggioToken, removeYggioToken, getUserId} from './token';
 
 import {WebSocket} from './websocket';
+
+export * from './apps';
+export * from './ui';
 
 export {
   request,
@@ -65,6 +63,9 @@ export {
   jobApi,
   jobRequests,
 
+  logsRequests,
+  logsTypes,
+
   clientAppsApi,
   clientAppsRequests,
 
@@ -78,4 +79,5 @@ export {
   requestBodySizeLimitRequests,
   requestBodySizeLimitApi,
 
+  connectorsRequests,
 };

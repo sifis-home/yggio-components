@@ -1,10 +1,3 @@
-/*
- * Copyright 2022 Sensative AB
- * 
- * This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at https://mozilla.org/MPL/2.0/.
- */
 import React, {useEffect} from 'react';
 import PropTypes from 'prop-types';
 import {compose} from 'lodash/fp';
@@ -16,7 +9,7 @@ import {
   TableLoadingIndicator,
 } from './components';
 import state from './state';
-import {withLanguage, withState} from '../../hocs';
+import {withState} from '../../hocs';
 import {
   TableWrapper,
   EmptyTableWrapper,
@@ -40,7 +33,6 @@ const Table = (
     setTableType,
     TableStyle,
     onClick,
-    t,
   }
 ) => {
 
@@ -104,7 +96,6 @@ const Table = (
       />
 
       <TablePagination
-        t={t}
         currentPage={currentPage}
         setCurrentPage={setCurrentPage}
         style={style}
@@ -130,5 +121,4 @@ Table.propTypes = {
 
 export default compose(
   withState(state),
-  withLanguage(),
 )(Table);

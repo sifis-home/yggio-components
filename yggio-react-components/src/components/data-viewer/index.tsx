@@ -1,16 +1,10 @@
-/*
- * Copyright 2022 Sensative AB
- * 
- * This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at https://mozilla.org/MPL/2.0/.
- */
 import React from 'react';
 import {Box, Text, Flex} from '@chakra-ui/react';
 import Tree, {useTreeState, DefaultNodeProps} from 'react-hyper-tree';
-import Icon from 'react-icons-kit';
-import {ic_chevron_right as chevronRightIcon} from 'react-icons-kit/md/ic_chevron_right';
-import {ic_expand_more as chevronDownIcon} from 'react-icons-kit/md/ic_expand_more';
+import {
+  MdKeyboardArrowDown as DownIcon,
+  MdKeyboardArrowRight as RightIcon,
+} from 'react-icons/md';
 
 import {COLORS} from '../../constants';
 import {DataViewerProps} from './types';
@@ -40,10 +34,10 @@ const CustomNode = (props: DefaultNodeProps) => {
       onClick={props.onToggle}
     >
       {props.node.options.hasChildren && (
-        <Text margin={'0 5px 0 0'}>
+        <Text margin={'0 5px 0 0'} display={'flex'}>
           {!props.node.options.opened
-            ? <Icon icon={chevronRightIcon as object} />
-            : <Icon icon={chevronDownIcon as object} />} {name.key}
+            ? <RightIcon size={18} />
+            : <DownIcon size={18} />} {name.key}
         </Text>
       )}
       {!props.node.options.hasChildren && (

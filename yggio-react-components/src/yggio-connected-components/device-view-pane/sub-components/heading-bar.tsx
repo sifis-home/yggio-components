@@ -1,20 +1,14 @@
-/*
- * Copyright 2022 Sensative AB
- * 
- * This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at https://mozilla.org/MPL/2.0/.
- */
 import React from 'react';
 import _ from 'lodash';
-import {Icon} from 'react-icons-kit';
-import {ic_dehaze as SidebarIcon} from 'react-icons-kit/md/ic_dehaze';
+import {MdOutlineMenu as SidebarIcon} from 'react-icons/md';
+import {useTranslation} from 'react-i18next';
 
-import {Translate} from '../../../types';
+import {TabItem} from '../types';
 import {
   HeadingBarContainer,
   HeadingBarLeftSection,
   HeadingBarMiddleSection,
+  HeadingBarMiddleIcon,
   ToggleSidebarButton,
 } from '../../../global/styled';
 
@@ -23,11 +17,11 @@ interface HeadingBarProps {
   siblingWidth: number;
   closeSidebar: () => void;
   openSidebar: () => void;
-  tabId: string;
-  t: Translate;
+  tabItem: TabItem;
 }
 
 const HeadingBar = (props: HeadingBarProps) => {
+  const {t} = useTranslation();
   return (
     <HeadingBarContainer>
       {/* @ts-ignore component not yet typescripted */}
@@ -41,11 +35,15 @@ const HeadingBar = (props: HeadingBarProps) => {
             }
           }}
         >
-          <Icon icon={SidebarIcon as object} size={17} />
+          <SidebarIcon size={17} />
         </ToggleSidebarButton>
       </HeadingBarLeftSection>
       <HeadingBarMiddleSection>
-        <p>{_.capitalize(props.t(`titles.${props.tabId}`))}</p>
+        {/* @ts-ignore component not yet typescripted */}
+        <HeadingBarMiddleIcon siblingWidth={props.siblingWidth}>
+          <props.tabItem.icon.file size={props.tabItem.icon.size} />
+        </HeadingBarMiddleIcon>
+        <p>{_.capitalize(t(`titles.${props.tabItem.path}`))}</p>
       </HeadingBarMiddleSection>
     </HeadingBarContainer>
   );

@@ -1,5 +1,6 @@
 {
   "common": {
+    "apps": "Apps",
     "name": "name",
     "device": "Gerät",
     "devices": "geräte",
@@ -22,9 +23,13 @@
     "setConnector": "Stecker setzen",
     "id": "id",
     "user": "Benutzer",
-    "devEui": "devEui"
+    "devEui": "devEui",
+    "by": "von",
+    "help": "hilfe",
+    "new": "neu"
   },
   "labels": {
+    "weatherDeviceInfo": "Wetter Geräteinfo",
     "finish": "ziel",
     "submit": "einreichen",
     "key": "schlüssel",
@@ -32,6 +37,7 @@
     "send": "senden",
     "filter": "filter",
     "newDevice": "neues gerät",
+    "views": "ansichten",
     "selectMany": "wähle viele aus",
     "selectAll": "wählen sie alle",
     "deselectAll": "alle abwählen",
@@ -71,6 +77,8 @@
     "customizeColumns": "Spalten anpassen",
     "tools": "werkzeuge",
     "addColumn": "Spalte hinzufügen",
+    "deleteColumn": "Spalte löschen",
+    "columns": "spalten",
     "selectPreset": "Voreinstellung auswählen",
     "backToDeviceList": "Zurück zur Geräteliste",
     "backToLocations": "Zurück zu den Standorten",
@@ -83,7 +91,26 @@
     "edit": "bearbeiten",
     "execute": "ausführen",
     "filterByName": "nach Namen filtern",
-    "filterByTags": "nach Tags filtern"
+    "filterByTags": "nach Tags filtern",
+    "versionAvailable": "Version verfügbar",
+    "versionsAvailable": "Versionen verfügbar",
+    "addTranslator": "Übersetzer hinzufügen",
+    "addAnotherTranslator": "Fügen Sie einen weiteren Übersetzer hinzu",
+    "alreadyAdded": "Schon hinzugefügt",
+    "addedTranslators": "Übersetzer hinzugefügt",
+    "logs": "protokolle",
+    "titles": "Titel",
+    "addUser": "Benutzer hinzufügen",
+    "exportAsString": "Als String exportieren",
+    "exportToOrganization": "Export zur Organisation",
+    "import": "Importieren",
+    "property": "Eigentum",
+    "comparison": "Vergleich",
+    "threshold": "Schwelle",
+    "color": "Farbe",
+    "add": "hinzufügen",
+    "reset": "zurücksetzen",
+    "create": "erstellen"
   },
   "titles": {
     "position": "position",
@@ -102,6 +129,7 @@
     "contextual-parameters": "Kontextparameter",
     "charts": "diagramme",
     "report-interval": "Berichtsintervall",
+    "commands": "Befehle",
     "lora-control": "LoRa steuerung",
     "connectionOnline": "live-updates offline",
     "connectionOffline": "offline",
@@ -126,9 +154,14 @@
     "tools": "werkzeuge",
     "measurement": "messung",
     "translators": "Übersetzungen",
-    "real-estate-core": "Real Estate Core"
+    "real-estate-core": "Real Estate Core",
+    "applyViewPreset": "Ansichtsvoreinstellung anwenden",
+    "deleteViewPreset": "Ansichtsvoreinstellung löschen",
+    "string": "zeichenfolge",
+    "organization": "organisation"
   },
   "phrases": {
+    "weatherDeviceInformation": "Bitte geben Sie wettergerätespezifische Informationen ein",
     "welcomeToYour": "Willkommen bei Ihnen",
     "removeCalculationVerification": "Möchten Sie diese Berechnung wirklich entfernen?",
     "deleteDeviceVerification": "Möchten Sie dieses Gerät wirklich löschen?",
@@ -169,7 +202,35 @@
     "calculationIntervalDisabled": "für ausgewählte Voreinstellung deaktiviert",
     "contextualParametersExplanation": "Kontextparameter sind benutzerdefinierte Daten, mit denen Sie beliebige Informationen auf dem Gerät speichern können.",
     "translatorSelectorExplanation": "Übersetzer können in der gewünschten Reihenfolge neu angeordnet und bearbeitet werden",
-    "invalidConfigurationDevices": "Mindestens eines der ausgewählten Geräte ist kein gültiges LoRa-Gerät"
+    "invalidConfigurationDevices": "Mindestens eines der ausgewählten Geräte ist kein gültiges LoRa-Gerät, oder nicht mit den anderen Geräten kompatibel ist (zwei Geräte sind unterschiedliche Arten von LoRa-Geräten, z. B. Netmore und ChirpStack)",
+    "matchWithDeviceModelName": "Übereinstimmung mit dem Gerätemodellnamen",
+    "cannotMatchWithDeviceModelName": "Kann nicht mit dem Gerätemodellnamen übereinstimmen, da das Gerät keinen hat",
+    "noTranslatorsFound": "Keine Übersetzer gefunden",
+    "selectATranslator": "Wählen Sie einen Übersetzer aus",
+    "noTranslatorsAdded": "Keine Übersetzer hinzugefügt",
+    "failedAccessRightCreation": "Das Zugriffsrecht konnte nicht erstellt werden",
+    "failedAccessRightRemoval": "Failed to remove access right",
+    "enterAccessUser": "Geben Sie den Benutzernamen des Benutzers ein, dem Sie Zugriff gewähren möchten",
+    "saveViewsText": "Speichern Sie die aktuelle Ansichtsvoreinstellung einschließlich aller Ihrer Filter, Spalten, Sortier- und Paging-Optionen",
+    "pleaseSelectOrg": "Bitte wählen Sie eine Organisation aus",
+    "pleaseSelectView": "Bitte wählen Sie eine Ansicht aus",
+    "noViewsFound": "Ansicht nicht gefunden",
+    "errorDeletingView": "Fehler beim Löschen der Ansicht",
+    "applyingView": "Durch Anwenden einer Ansichtsvoreinstellung werden alle Einstellungen Ihrer Geräteliste ersetzt.",
+    "selectViewToApply": "Wählen Sie eine voreingestellte Ansicht aus, die Sie auf die Geräteliste anwenden möchten",
+    "successfullyRemovedViewPreset": "Ansichtsvoreinstellung erfolgreich entfernt",
+    "successfullySavedViewPreset": "Ansichtsvoreinstellung erfolgreich gespeichert",
+    "selectViewToExport": "Wählen Sie eine Ansicht zum Exportieren aus. Sie können eine Ansicht in eine Organisation oder als zu importierende Zeichenfolge exportieren.",
+    "selectExportType": "Wählen Sie den Exporttyp",
+    "copyImportString": "Kopieren Sie die Zeichenfolge unten und fügen Sie sie in das Importfeld ein",
+    "onlyOneExportATime": "Eine Ansicht kann jeweils nur in eine Organisation exportiert werden.",
+    "selectOrganizationToExport": "Wählen Sie eine Organisation aus, in die die Ansicht exportiert werden soll.",
+    "successfullyExportedViewToOrganization": "Die Ansichtsvoreinstellung wurde erfolgreich in die Organisation exportiert",
+    "pasteAString": "Fügen Sie eine Zeichenfolge ein, um eine Ansicht zu importieren. Es wird in Ihren Ansichtsvoreinstellungen gespeichert.",
+    "successfullyImportedView": "Ansicht erfolgreich importiert",
+    "invalidImportString": "Ungültige Importzeichenfolge",
+    "somethingWentWrong": "Es ist ein Fehler aufgetreten. Bitte wenden Sie sich an den Yggio-Support",
+    "columnDeleted": "Spalte gelöscht"
   },
   "placeholders": {
     "search": "suche",
@@ -184,7 +245,13 @@
     "groupBy": "Gruppiere nach",
     "action": "Aktion",
     "preset": "Voreinstellung",
-    "deviceNameFilter": "Gerätename suchen..."
+    "deviceNameFilter": "Gerätename suchen...",
+    "newViewsName": "Namen anzeigen...",
+    "viewPresets": "Voreinstellungen anzeigen",
+    "selectOrganization": "Organisation auswählen",
+    "pasteStringHere": "Zeichenfolge hier einfügen",
+    "columnName": "Name Ihrer Kolumne...",
+    "columnField": "Eigenschaft, die in der Spalte angezeigt werden soll"
   },
   "deviceStatus": {
     "gatewayOffline": "Gateway offline",
@@ -240,7 +307,8 @@
     "moisture": "Feuchtigkeit",
     "luminance": "Luminanz",
     "illuminance": "Beleuchtungsstärke",
-    "presence": "Gegenwart"
+    "presence": "Gegenwart",
+    "calculations": "Berechnung"
   },
   "pagination": {
     "items_per_page": "/ seite",
@@ -269,6 +337,11 @@
     "spreadingFactor": "Spreading factor",
     "expectedReportInterval": "Erwartetes Berichtsintervall",
     "owned": "Im Besitz",
-    "actions": "Aktionen"
+    "actions": "Aktionen",
+    "deviceModelName": "Name des Gerätemodells",
+    "commandButtons": "Befehlsschaltflächen"
+  },
+  "map": {
+    "autoZoom": "Automatischer zoom"
   }
 }

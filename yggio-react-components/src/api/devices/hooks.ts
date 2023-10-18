@@ -1,10 +1,3 @@
-/*
- * Copyright 2022 Sensative AB
- * 
- * This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at https://mozilla.org/MPL/2.0/.
- */
 import _ from 'lodash';
 import {useQuery, useMutation, QueryClient} from '@tanstack/react-query';
 import {toast} from 'react-hot-toast';
@@ -15,48 +8,55 @@ import {
   Device,
   DeviceCommand,
   FetchDevicesProps,
-  SelectorType,
   RealEstateCoreResponse,
   Devices,
+  MountRecDeviceParams,
 } from '../../types';
 
 /*
-  Because the usage of WebSockets and real time updates
-  we have decided to just set staleTime to Infinity.
+   Because the usage of WebSockets and real time updates
+   we have decided to just set staleTime to Infinity.
 
-  This leads to @tanstack/react-query fetching data once and never
-  trying to keep it fresh, because that work now falls
-  upon WebSockets.
-*/
+   This leads to @tanstack/react-query fetching data once and never
+   trying to keep it fresh, because that work now falls
+   upon WebSockets.
+   */
 const defaultOptions = {
+  cacheTime: Infinity,
   staleTime: Infinity,
   refetchOnWindowFocus: false,
 };
 
-const useNumDevicesQuery = () => (
-  useQuery(
-    ['devices'],
-    async () => devicesRequests.fetchHeaders({limit: 1, offset: 0}),
-    {
-      ...defaultOptions,
-      select: headers => headers['fiware-total-count'],
-    }
-  )
-);
+const useNumDevicesQuery = (props?: DevicesQuery) => {
+  const params = props?.params
+    ? props.params
+    : {limit: 1, offset: 0};
+  return (
+    useQuery(
+      ['devices', 'count', props?.params],
+      async () => devicesRequests.fetchHeaders(params),
+      {
+        ...defaultOptions,
+        select: headers => headers['fiware-total-count'],
+      }
+    )
+  );
+};
 
 interface DevicesQuery {
-  params: FetchDevicesProps;
-  select: SelectorType;
+  params: FetchDevicesProps | null;
+  enabled?: boolean;
+  keepPreviousData?: boolean;
 }
 
 const useDevicesQuery = (props: DevicesQuery) => (
   useQuery(
     ['devices', props.params],
-    async () => devicesRequests.fetch(props.params),
+    async () => devicesRequests.fetch(props.params!),
     {
       ...defaultOptions,
-      keepPreviousData: true,
-      select: data => props.select(data),
+      enabled: (_.has(props, 'enabled') ? props.enabled : true),
+      keepPreviousData: (_.has(props, 'keepPreviousData') ? props.keepPreviousData : false),
     }
   )
 );
@@ -64,10 +64,14 @@ const useDevicesQuery = (props: DevicesQuery) => (
 const useDevicesWithNumTotalDevicesQuery = (props: DevicesQuery) => (
   useQuery(
     ['devices', props.params],
-    async () => devicesRequests.fetchBodyAndHeaders(props.params),
+    async () => devicesRequests.fetchBodyAndHeaders(props.params!),
     {
       ...defaultOptions,
       keepPreviousData: true,
+      select: ({body, headers}) => ({
+        items: body,
+        totalCount: headers['fiware-total-count'],
+      }),
     }
   )
 );
@@ -98,7 +102,7 @@ const useConnectorsDevicesQuery = () => {
       attributeExists: 'downlinkQueue',
     },
   };
-  const devicesQuery = useDevicesQuery({params, select: data => data});
+  const devicesQuery = useDevicesQuery({params});
   const devicesPeekQuery = useDevicesPeekQuery(params);
   const union = _.unionBy(devicesQuery.data as Devices, devicesPeekQuery.data as Devices, '_id');
   return union;
@@ -111,7 +115,7 @@ const useConnectorDevicesQuery = (connector: string) => {
       matchPattern: {downlinkQueue: connector},
     },
   };
-  return useDevicesQuery({params, select: data => data});
+  return useDevicesQuery({params});
 };
 
 const useDeviceQuery = (props: {deviceId: string}) => (
@@ -143,11 +147,8 @@ const useSeekDevicesQuery = (props: SeekDevicesQuery) => (
 
 const useStatisticsFieldsQuery = (deviceId: string) => (
   useQuery(
-    ['devices', 'statisticsFields', deviceId],
+    ['statisticsFields', deviceId],
     async () => devicesRequests.getStatisticsFields(deviceId),
-    {
-      ...defaultOptions,
-    }
   )
 );
 
@@ -200,20 +201,15 @@ const useCommandDevice = (queryClient: QueryClient) => useMutation(
   }
 );
 
-const useBatchCreateDevices = () => useMutation(
-  async (items: Record<string, string>[]) => devicesRequests.batchCreate(items),
-);
-
 // REAL ESTATE CORE HOOKS
 
-const useRecDataQuery = (connectorId: string, deviceId: string) => useQuery(
+const useRecDataQuery = (deviceId: string) => useQuery(
   ['device', deviceId, 'real-estate-core'],
   async () => {
     return devicesRequests.getRealEstateCoreData(deviceId);
   },
   {
     ...defaultOptions,
-    enabled: !!connectorId,
     refetchOnWindowFocus: false,
     retry: false,
     meta: {
@@ -328,12 +324,6 @@ const useProvisionRecDevice = (
   },
 );
 
-interface MountRecDeviceParams {
-  realEstateId: string;
-  roomId: string;
-  isCastellumMatilda: boolean;
-}
-
 const useMountRecDevice = (
   queryClient: QueryClient,
   connectorId: string,
@@ -396,7 +386,6 @@ export {
   useUpdateDevice,
   useRemoveDevice,
   useCommandDevice,
-  useBatchCreateDevices,
 
   useRecDataQuery,
   useRecRealEstatesQuery,
@@ -406,6 +395,4 @@ export {
   useProvisionRecDevice,
   useMountRecDevice,
   useDismountRecDevice,
-
-  MountRecDeviceParams,
 };

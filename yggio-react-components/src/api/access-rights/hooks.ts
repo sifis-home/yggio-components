@@ -1,44 +1,43 @@
-/*
- * Copyright 2022 Sensative AB
- * 
- * This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at https://mozilla.org/MPL/2.0/.
- */
 import {useQuery, useMutation, QueryClient} from '@tanstack/react-query';
 import {accessRightsRequests} from '.';
-import {AccessRightCreationTemplate, AccessRightDeletionTemplate} from './types';
+import {AccessRightCreationTemplate, AccessRightDeletionParams} from './types';
+import {ResourceType} from '../../types';
 
 interface AccessRightsQuery {
-  subjectId: string;
-  select: (data: unknown) => unknown;
+  subjectId?: string;
+  subjectType: 'user' | 'group';
+  resourceType: ResourceType;
 }
 
 const useAccessRightsSubjectQuery = ({
   subjectId,
-  select,
+  subjectType,
+  resourceType,
 }: AccessRightsQuery) => (
   useQuery(
     ['subjectAccessRights'],
-    async () => accessRightsRequests.fetchSubject({subjectId}),
-    {select, enabled: !!subjectId},
+    async () => accessRightsRequests.fetchSubjectAccessRights({subjectId: subjectId!, subjectType, resourceType}),
+    {
+      enabled: !!subjectId
+    },
   )
 );
 
 const useAccessRightsResourceQuery = ({
-  deviceId,
-}: {deviceId: string}) => (
+  resourceId,
+  resourceType
+}: {resourceId: string, resourceType: ResourceType}) => (
   useQuery(
     ['resourceAccessRights'],
-    async () => accessRightsRequests.fetchResource({deviceId}),
+    async () => accessRightsRequests.fetchResourceAccessRights({resourceId, resourceType}),
     {
-      enabled: !!deviceId,
+      enabled: !!resourceId,
     },
   )
 );
 
 const useCreateAccessRight = (queryClient: QueryClient) => useMutation(
-  async (props: AccessRightCreationTemplate) => accessRightsRequests.create(props),
+  async (template: AccessRightCreationTemplate) => accessRightsRequests.createAccessRight(template),
   {
     onSuccess: async () => {
       await queryClient.invalidateQueries(['resourceAccessRights']);
@@ -48,7 +47,7 @@ const useCreateAccessRight = (queryClient: QueryClient) => useMutation(
 );
 
 const useRemoveAccessRight = (queryClient: QueryClient) => useMutation(
-  async (props: AccessRightDeletionTemplate) => accessRightsRequests.remove(props),
+  async (props: AccessRightDeletionParams) => accessRightsRequests.removeAccessRight(props),
   {
     onSuccess: async () => {
       await queryClient.invalidateQueries(['resourceAccessRights']);

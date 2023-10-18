@@ -1,10 +1,3 @@
-/*
- * Copyright 2022 Sensative AB
- * 
- * This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at https://mozilla.org/MPL/2.0/.
- */
 import React, {useEffect} from 'react';
 import _ from 'lodash';
 import {useQuery} from '@tanstack/react-query';
@@ -87,7 +80,7 @@ const SearchDeviceStep = (props: SearchDeviceStepProps) => {
             placeholder='Enter name'
             height={'40px'}
             value={props.form.formInputs.name.value as string}
-            onChange={(evt: React.ChangeEvent<HTMLInputElement>) => {
+            onChange={evt => {
               props.form.setInputValue(PARAMETERS.name, evt.target.value);
             }}
           />
@@ -97,7 +90,7 @@ const SearchDeviceStep = (props: SearchDeviceStepProps) => {
             placeholder='Enter DevEUI'
             height={'40px'}
             value={props.form.formInputs.devEui.value as string}
-            onChange={(evt: React.ChangeEvent<HTMLInputElement>) => {
+            onChange={evt => {
               props.form.setInputValue(PARAMETERS.devEui, evt.target.value);
             }}
           />
@@ -107,7 +100,7 @@ const SearchDeviceStep = (props: SearchDeviceStepProps) => {
             placeholder='Enter secret'
             height={'40px'}
             value={props.form.formInputs.secret.value as string}
-            onChange={(evt: React.ChangeEvent<HTMLInputElement>) => {
+            onChange={evt => {
               props.form.setInputValue(PARAMETERS.secret, evt.target.value);
             }}
           />
@@ -117,7 +110,7 @@ const SearchDeviceStep = (props: SearchDeviceStepProps) => {
             placeholder='Enter MAC address'
             height={'40px'}
             value={props.form.formInputs.mac.value as string}
-            onChange={(evt: React.ChangeEvent<HTMLInputElement>) => {
+            onChange={evt => {
               props.form.setInputValue(PARAMETERS.mac, evt.target.value);
             }}
           />
@@ -127,7 +120,7 @@ const SearchDeviceStep = (props: SearchDeviceStepProps) => {
             placeholder='Enter IMEI'
             height={'40px'}
             value={props.form.formInputs.imei.value as string}
-            onChange={(evt: React.ChangeEvent<HTMLInputElement>) => {
+            onChange={evt => {
               props.form.setInputValue(PARAMETERS.imei, evt.target.value);
             }}
           />

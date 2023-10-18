@@ -1,10 +1,3 @@
-/*
- * Copyright 2022 Sensative AB
- * 
- * This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at https://mozilla.org/MPL/2.0/.
- */
 import styled from 'styled-components';
 
 const Heading = styled.h2`
@@ -45,20 +38,10 @@ const Link = styled.p`
   cursor: pointer;
 `;
 
-const CsvLinkWrapper = styled.div`
-  a {
-    color: #125AC7;
-    text-decoration: underline;
-    margin: 0;
-    cursor: pointer;
-  }
-`;
-
 export {
   Heading,
   SubHeading,
   ContentContainer,
   NavButtonsContainer,
   Link,
-  CsvLinkWrapper,
 };

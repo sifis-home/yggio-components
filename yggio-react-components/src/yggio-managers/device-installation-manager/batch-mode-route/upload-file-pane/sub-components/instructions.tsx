@@ -1,19 +1,12 @@
-/*
- * Copyright 2022 Sensative AB
- * 
- * This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at https://mozilla.org/MPL/2.0/.
- */
 import React, {useState} from 'react';
 import {useQueryClient} from '@tanstack/react-query';
 import _ from 'lodash';
 
 // Logic
-import {FIELDS} from '../constants';
+import {INSTRUCTION_FIELDS} from '../constants';
 import {devicesApi} from '../../../../../api';
 import {LORA_CONNECTOR_TYPES} from '../../../constants';
-import {resolveConnectorName} from '../../utils';
+import {resolveConnectorName} from '../utils';
 import {selectConnectorItems} from '../selectors';
 import {CommandData} from '../types';
 
@@ -114,14 +107,14 @@ const Instructions = () => {
 
       <InstructionHeading>Common fields</InstructionHeading>
 
-      {_.map(FIELDS, (items, heading) => (
+      {_.map(INSTRUCTION_FIELDS, (items, heading) => (
         <React.Fragment key={heading}>
           <FieldsTableHeading>{heading}</FieldsTableHeading>
           <FieldsTable>
             {_.map(items, item => (
               <React.Fragment key={item.name}>
                 <FieldsTableItem>{item.name}</FieldsTableItem>
-                <FieldsTableItem>{item.description}</FieldsTableItem>
+                <FieldsTableItem>{item.description || ''}</FieldsTableItem>
               </React.Fragment>
             ))}
           </FieldsTable>

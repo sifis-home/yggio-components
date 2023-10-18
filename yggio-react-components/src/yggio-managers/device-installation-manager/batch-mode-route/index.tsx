@@ -1,40 +1,39 @@
-/*
- * Copyright 2022 Sensative AB
- * 
- * This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at https://mozilla.org/MPL/2.0/.
- */
 import React, {useState} from 'react';
 import _ from 'lodash';
 import {NextRouter} from 'next/router';
+import {useMutation} from '@tanstack/react-query';
 
+import {jobRequests} from '../../../api';
 import {STEP_NOT_FOUND} from '../constants';
 import {STEPS} from './constants';
 import {useLocalState} from '../../../hooks';
 import navigationState from '../state';
-import {Navigation} from '../types';
-import {Job} from '../../../types';
 
 import StepProgressBar from '../../../components/step-progress-bar';
-
 import UploadFilePane from './upload-file-pane';
+import StartInstallationPane from './start-installation-pane';
 import InstallationPane from './installation-pane';
-import ResultPane from './result-pane';
 import {CenteredPage} from '../../../global/components';
 
 const steps = _.values(STEPS);
 
 interface Props {
   router: NextRouter;
-  navigation: Navigation;
 }
 
 const BatchModeRoute = (props: Props) => {
 
   const navigation = useLocalState(navigationState);
 
-  const [result, setResult] = useState<Job>();
+  const batchCreateDevicesMutation = useMutation(
+    async (data: Record<string, string>[]) => jobRequests.createDevicesJob(data),
+    {
+      onSuccess: () => {
+        navigation.incrementCurrentStep();
+      },
+    }
+  );
+
   const [uploadItems, setUploadItems] = useState<Record<string, string>[] | undefined>();
 
   return (
@@ -55,18 +54,17 @@ const BatchModeRoute = (props: Props) => {
           />
         ),
         [STEPS.startInstallation.name]: (
-          <InstallationPane
-            goToPreviousStep={navigation.decrementCurrentStep}
-            goToNextStep={navigation.incrementCurrentStep}
+          <StartInstallationPane
+            batchCreateDevicesMutation={batchCreateDevicesMutation}
             uploadItems={uploadItems!}
-            setResult={setResult}
+            goToPreviousStep={navigation.decrementCurrentStep}
           />
         ),
         [STEPS.result.name]: (
-          <ResultPane
-            router={props.router}
+          <InstallationPane
+            jobId={batchCreateDevicesMutation.data?._id}
             uploadItems={uploadItems!}
-            result={result!}
+            router={props.router}
           />
         ),
         [STEP_NOT_FOUND]: (

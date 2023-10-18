@@ -1,14 +1,6 @@
-/*
- * Copyright 2022 Sensative AB
- * 
- * This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at https://mozilla.org/MPL/2.0/.
- */
 import React from 'react';
 import _ from 'lodash';
-import {Icon} from 'react-icons-kit';
-import {check as checkIcon} from 'react-icons-kit/entypo/check';
+import {MdCheck as CheckIcon} from 'react-icons/md'; // Checkmark
 
 import {
   BarContainer,
@@ -36,7 +28,7 @@ const Bar = (
       reached={i <= currentStep - 2}
       key={i}
     >
-      {i <= currentStep - 3 && <Icon icon={checkIcon} size={14} />}
+      {i <= currentStep - 3 && <CheckIcon size={16} />}
     </IntermediateStepMark>
   );
 
@@ -48,11 +40,11 @@ const Bar = (
         <BarFilling width={barFillingWidth} />
       </BarStyled>
       <FirstStepMark>
-        {currentStep > 1 && <Icon icon={checkIcon} size={14} />}
+        {currentStep > 1 && <CheckIcon size={16} />}
       </FirstStepMark>
       {renderIntermediateStepMarks}
       <LastStepMark reached={currentStep === intermediateSteps.length + 2}>
-        {finished && <Icon icon={checkIcon} size={14} />}
+        {finished && <CheckIcon size={16} />}
       </LastStepMark>
     </BarContainer>
   );

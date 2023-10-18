@@ -1,10 +1,3 @@
-/*
- * Copyright 2022 Sensative AB
- * 
- * This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at https://mozilla.org/MPL/2.0/.
- */
 import React from 'react';
 import _ from 'lodash';
 import {compose} from 'lodash/fp';
@@ -63,6 +56,7 @@ MarkersLayer.propTypes = {
 };
 
 const BasicMap = props => {
+  const [autoZoom, setAutoZoom] = React.useState(true);
   const deviceItems = _.get(props, 'mapLayers.devices.items') || [];
   const locationItems = _.get(props, 'mapLayers.locations.items') || [];
   const allItems = _.concat(deviceItems, locationItems);
@@ -80,6 +74,8 @@ const BasicMap = props => {
         </StyledMessageBox>
       )}
       <MapButtons
+        autoZoom={autoZoom}
+        setAutoZoom={setAutoZoom}
         showGetLocation={props.showGetLocation}
         viewOnly={props.viewOnly}
         viewport={props.viewport}
@@ -95,7 +91,7 @@ const BasicMap = props => {
         zoom={props.viewport.zoom}
         minZoom={2}
         maxZoom={18}
-        bounds={!_.isEmpty(bounds) ? bounds : null}
+        bounds={autoZoom && !_.isEmpty(bounds) ? bounds : null}
         maxBounds={[
           [-90, -180],
           [90, 180]

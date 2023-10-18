@@ -1,10 +1,3 @@
-/*
- * Copyright 2022 Sensative AB
- * 
- * This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at https://mozilla.org/MPL/2.0/.
- */
 import {VALIDATION_VISIBILITY_TYPES} from '../utils/form-wizard';
 
 interface Validation {
@@ -13,7 +6,7 @@ interface Validation {
   isVisible: boolean | undefined,
 }
 
-type InputValue = string | number | object | boolean;
+type InputValue = string | number | object | boolean | string[];
 
 interface FormInput {
   validation: Validation,
@@ -33,10 +26,14 @@ interface Form {
   resetForm: () => void;
 }
 
-interface Validator {
+interface ValidatorObject {
   validate: (value: InputValue, formInputs?: FormInputs) => boolean;
   message: string | ((value: InputValue) => string);
 }
+
+type ValidatorFunction = (value: InputValue, formInputs?: FormInputs) => void;
+
+type Validator = ValidatorObject | ValidatorFunction;
 
 interface InputConfig {
   defaultValue: InputValue,
@@ -51,7 +48,7 @@ interface FormConfig {
   [inputName: string]: InputConfig;
 }
 
-export {
+export type {
   Validation,
   Validator,
   Form,

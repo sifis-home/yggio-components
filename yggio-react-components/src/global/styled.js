@@ -1,10 +1,3 @@
-/*
- * Copyright 2022 Sensative AB
- * 
- * This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at https://mozilla.org/MPL/2.0/.
- */
 import styled, {css} from 'styled-components';
 import {MEASUREMENTS, COLORS} from '../constants';
 
@@ -155,7 +148,7 @@ const HeadingBarLeftSection = styled.div`
   margin: 5px 13px 5px 0;
   flex-shrink: 0;
 
-  @media (min-width: ${({siblingWidth}) => siblingWidth + 260}px) {
+  @media (min-width: ${({siblingWidth}) => siblingWidth + 290}px) {
     display: none;
   }
 `;
@@ -167,6 +160,14 @@ const HeadingBarMiddleSection = styled.div`
   align-items: center;
   flex-grow: 1;
   margin: 5px 0;
+  color: #333;
+`;
+
+const HeadingBarMiddleIcon = styled.div`
+  margin: 0 7px 0 0;
+  @media (max-width: ${({siblingWidth}) => siblingWidth + 289}px) {
+    display: none;
+  }
 `;
 
 const HeadingBarRightSection = styled.div`
@@ -195,6 +196,14 @@ const TextParagraph = styled.p`
   font-size: ${({fontSize}) => fontSize};
 `;
 
+const ErrorView = styled.div`
+  width: 100%;
+  margin-top: 100px;
+  text-align: center;
+  color: #666;
+  font-size: 18px;
+`;
+
 export {
   CommonWrapper,
   MarginWrapper,
@@ -218,7 +227,9 @@ export {
   HeadingBarContainer,
   HeadingBarLeftSection,
   HeadingBarMiddleSection,
+  HeadingBarMiddleIcon,
   HeadingBarRightSection,
   ToggleSidebarButton,
   TextParagraph,
+  ErrorView,
 };

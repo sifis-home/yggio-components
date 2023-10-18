@@ -1,10 +1,3 @@
-/*
- * Copyright 2022 Sensative AB
- * 
- * This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at https://mozilla.org/MPL/2.0/.
- */
 type GenericFunctionType = () => void;
 
 interface InputOption {
@@ -19,14 +12,16 @@ interface DeviceModelName {
   displayName: string;
 }
 
-type SelectorType = (data: unknown) => unknown;
+type Translate = (key: string, opts?: {defaultValue: string}) => string;
 
-type Translate = (key: string) => string;
+type DeepPartial<T> = {
+  [P in keyof T]?: DeepPartial<T[P]>;
+};
 
-export {
+export type {
   GenericFunctionType,
   InputOptions,
   DeviceModelName,
-  SelectorType,
   Translate,
+  DeepPartial,
 };

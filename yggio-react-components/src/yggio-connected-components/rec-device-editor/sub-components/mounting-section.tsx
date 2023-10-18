@@ -1,10 +1,3 @@
-/*
- * Copyright 2022 Sensative AB
- * 
- * This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at https://mozilla.org/MPL/2.0/.
- */
 import React from 'react';
 import {UseMutationResult} from '@tanstack/react-query';
 
@@ -41,7 +34,7 @@ const MountedSection = (props: Props) => {
       <Select
         label={'Real estate'}
         options={props.options?.realEstate || []}
-        onChange={(evt: React.ChangeEvent<HTMLInputElement>) => {
+        onChange={evt => {
           props.form.setInputValue('realEstate', evt.target.value);
           props.form.setInputValue('building', '');
           props.form.setInputValue('storey', '');
@@ -58,7 +51,7 @@ const MountedSection = (props: Props) => {
         <Select
           label={'Building'}
           options={props.options?.building || []}
-          onChange={(evt: React.ChangeEvent<HTMLInputElement>) => {
+          onChange={evt => {
             props.form.setInputValue('building', evt.target.value);
             props.form.setInputValue('storey', '');
             props.form.setInputValue('room', '');
@@ -75,7 +68,7 @@ const MountedSection = (props: Props) => {
         <Select
           label={'Storey'}
           options={props.options?.storey || []}
-          onChange={(evt: React.ChangeEvent<HTMLInputElement>) => {
+          onChange={evt => {
             props.form.setInputValue('storey', evt.target.value);
             props.form.setInputValue('room', '');
           }}
@@ -91,7 +84,7 @@ const MountedSection = (props: Props) => {
         <Select
           label={'Room'}
           options={props.options?.room || []}
-          onChange={(evt: React.ChangeEvent<HTMLInputElement>) => props.form.setInputValue('room', evt.target.value)}
+          onChange={evt => props.form.setInputValue('room', evt.target.value)}
           value={props.form.formInputs.room.value as string}
           isClearable
           isSearchable

@@ -1,10 +1,3 @@
-/*
- * Copyright 2022 Sensative AB
- * 
- * This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at https://mozilla.org/MPL/2.0/.
- */
 import {getConfig} from '../yggio-config';
 
 interface ExternalUrls {
@@ -16,6 +9,7 @@ interface ExternalUrls {
   stripsConfig: string;
   webshop: string;
   deviceUpdater: string;
+  stripsBatteryCalculator: string;
 }
 
 const getExternalUrls = (): ExternalUrls => {
@@ -23,12 +17,15 @@ const getExternalUrls = (): ExternalUrls => {
     docs: `https://${getConfig().domain}/docs`,
     swagger: `https://${getConfig().domain}/swagger`,
     locationManager: `https://${getConfig().domain}/location-manager`,
-    ruleEngine: `https://${getConfig().domain}/rule-manager`,
+    ruleEngine: `https://${getConfig().domain}/rule-manager/start`,
     controlPanelV1: `https://${getConfig().domain}/control-panel`,
     stripsConfig: `https://strips-lora-config-app.service.sensative.net/profiles`,
     webshop: 'https://shop.sensative.com/',
     deviceUpdater: `https://${getConfig().domain}/device-updater`,
+    stripsBatteryCalculator: `https://strips-battery-calculator.service.sensative.net/`,
   };
 };
 
-export default getExternalUrls;
+export {
+  getExternalUrls,
+};

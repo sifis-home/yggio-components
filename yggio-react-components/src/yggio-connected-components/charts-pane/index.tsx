@@ -1,21 +1,12 @@
-/*
- * Copyright 2022 Sensative AB
- * 
- * This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at https://mozilla.org/MPL/2.0/.
- */
 import React from 'react';
-import {useQuery, useQueries} from '@tanstack/react-query';
+import {useQueries} from '@tanstack/react-query';
 
-import {devicesRequests} from '../../api';
+import {devicesRequests, devicesApi} from '../../api';
 import {
-  addDeviceOptionsSelector,
   availableFieldsSelector,
   fieldOptionsSelector,
   chartEntriesSelector,
   deviceIdsInUrlSelector,
-  addedDevicesSelector,
 } from './selectors';
 import {useLocalState} from '../../hooks';
 import localStateOptions from './state';
@@ -41,37 +32,26 @@ const ChartsPane = () => {
   const sidebarState = useLocalState(sidebarStateOptions);
   const localState = useLocalState(localStateOptions);
 
-  const addedDevicesQueries = useQueries({
-    queries: addedDevicesIds.map(deviceId => ({
-      queryKey: ['devices', deviceId],
-      queryFn: async () => devicesRequests.fetchOne({deviceId}),
-      refetchOnWindowFocus: false,
-    }))
+  const addedDevicesQuery = devicesApi.useDevicesQuery({
+    params: {filter: {idPattern: addedDevicesIds}},
+    enabled: addedDevicesIds.length > 0,
   });
 
-  const addedDevices = addedDevicesSelector(addedDevicesQueries);
-
-  const devicesQuery = useQuery(
-    ['devices'],
-    async () => devicesRequests.fetch({}),
-    {refetchOnWindowFocus: false}
-  );
+  const addedDevices = addedDevicesQuery.data || [];
 
   const fieldsQueries = useQueries({
     queries: addedDevices.map(device => ({
-      queryKey: ['devices', device.id, 'statistics', 'fields'],
-      queryFn: async () => devicesRequests.getStatisticsFields(device.id),
+      queryKey: ['statisticsFields', device.id],
+      queryFn: async () => devicesRequests.getStatisticsFields(device._id),
       refetchOnWindowFocus: false,
     }))
   });
-
-  const addDeviceOptions = addDeviceOptionsSelector(addedDevices, devicesQuery.data);
 
   const availableFields = availableFieldsSelector(addedDevices, fieldsQueries);
 
   const fieldOptions = fieldOptionsSelector(localState.fields, availableFields);
 
-  const chartEntries = chartEntriesSelector(localState.fields, availableFields, devicesQuery.data);
+  const chartEntries = chartEntriesSelector(localState.fields, availableFields, addedDevices);
 
   return (
     <SidebarParent>
@@ -79,7 +59,6 @@ const ChartsPane = () => {
         addedDevices={addedDevices}
         localState={localState}
         sidebarState={sidebarState}
-        addDeviceOptions={addDeviceOptions}
         availableFields={availableFields}
         fieldOptions={fieldOptions}
       />

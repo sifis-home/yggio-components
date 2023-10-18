@@ -1,21 +1,10 @@
-/*
- * Copyright 2022 Sensative AB
- * 
- * This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at https://mozilla.org/MPL/2.0/.
- */
 import {generateForm, VALIDATION_VISIBILITY_TYPES} from '../../../../utils/form-wizard';
 import {FormConfig, InputValue} from '../../../../types';
+import {parseDeltaControlsSettings} from '../../../../utils';
+import {DEFAULT_DELTA_CONTROLS_SETTINGS} from '../../../../constants';
 
 const channelConfig: FormConfig = {
   name: {
-    defaultValue: '',
-    validation: {
-      visibilityType: VALIDATION_VISIBILITY_TYPES.optIn,
-    }
-  },
-  topic: {
     defaultValue: '',
     validation: {
       visibilityType: VALIDATION_VISIBILITY_TYPES.optIn,
@@ -29,7 +18,7 @@ const channelConfig: FormConfig = {
         {
           validate (value: InputValue) {
             if (typeof value === 'string') {
-              const urlRegex = new RegExp(/[-a-zA-Z0-9@:%._~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_.~#?&//=]*)?/gi);
+              const urlRegex = /^https?:\/\/\w+(\.\w+)*(:[0-9]+)?\/?(\/[.\w]*)*$/;
               return !!value.match(urlRegex);
             }
             return false;
@@ -53,8 +42,8 @@ const channelConfig: FormConfig = {
         {
           validate (value: InputValue) {
             if (typeof value === 'string') {
-              const UUIDRegex = new RegExp(/^[0-9a-fA-F]{8}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{12}$/);
-              const mongoIdRegex = new RegExp(/^(?=[a-f\d]{24}$)(\d+[a-f]|[a-f]+\d)/i);
+              const UUIDRegex = /^[0-9a-fA-F]{8}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{12}$/;
+              const mongoIdRegex = /^(?=[a-f\d]{24}$)(\d+[a-f]|[a-f]+\d)/i;
 
               return !!(value.match(UUIDRegex) || value.match(mongoIdRegex));
             }
@@ -76,6 +65,21 @@ const channelConfig: FormConfig = {
     validation: {
       visibilityType: VALIDATION_VISIBILITY_TYPES.optIn,
     }
+  },
+  connector: {
+    defaultValue: '',
+    validation: {
+      visibilityType: VALIDATION_VISIBILITY_TYPES.optIn,
+    }
+  },
+  deltaControlsSettings: {
+    defaultValue: DEFAULT_DELTA_CONTROLS_SETTINGS,
+    validation: {
+      visibilityType: VALIDATION_VISIBILITY_TYPES.always,
+      validators: [
+        parseDeltaControlsSettings,
+      ]
+    },
   },
 };
 

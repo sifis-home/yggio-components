@@ -1,10 +1,3 @@
-/*
- * Copyright 2022 Sensative AB
- * 
- * This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at https://mozilla.org/MPL/2.0/.
- */
 import {InputOptions} from '../../../../types';
 
 import {LORA_ACTIVATION_TYPES} from '../constants';
@@ -30,6 +23,40 @@ const CLASS_TYPE_OPTIONS: InputOptions = [
   },
 ];
 
+const NETMORE_LORAWAN_VERSION_OPTIONS: InputOptions = [
+  {
+    value: 'V100@SENSOR_COMMON',
+    label: '1.0.0',
+  },
+  {
+    value: 'V101@SENSOR_COMMON',
+    label: '1.0.1',
+  },
+  {
+    value: 'V102@SENSOR_COMMON',
+    label: '1.0.2',
+  },
+  {
+    value: 'V103@SENSOR_COMMON',
+    label: '1.0.3',
+  },
+];
+
+const THINGPARK_LORAWAN_VERSION_OPTIONS: InputOptions = [
+  {
+    value: '1.0.2',
+    label: '1.0.2',
+  },
+  {
+    value: '1.0.3',
+    label: '1.0.3',
+  },
+  {
+    value: '1.0.4',
+    label: '1.0.4',
+  },
+];
+
 const EXTERNAL_JOIN_SERVER_OPTIONS: InputOptions = [
   {
     value: 'yes',
@@ -41,20 +68,10 @@ const EXTERNAL_JOIN_SERVER_OPTIONS: InputOptions = [
   },
 ];
 
-const DEVICE_PROFILES_OPTIONS: InputOptions = [
-  {
-    value: 'LORA/GenericA.1.0.2a_ETSI_Rx2-SF12',
-    label: 'Class A',
-  },
-  {
-    value: 'LORA/GenericC.1.0.2a_ETSI_Rx2-SF12',
-    label: 'Class C',
-  },
-];
-
 export {
   ACTIVATION_TYPE_OPTIONS,
   CLASS_TYPE_OPTIONS,
+  NETMORE_LORAWAN_VERSION_OPTIONS,
+  THINGPARK_LORAWAN_VERSION_OPTIONS,
   EXTERNAL_JOIN_SERVER_OPTIONS,
-  DEVICE_PROFILES_OPTIONS,
 };

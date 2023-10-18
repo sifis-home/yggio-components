@@ -1,10 +1,3 @@
-/*
- * Copyright 2022 Sensative AB
- * 
- * This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at https://mozilla.org/MPL/2.0/.
- */
 import React from 'react';
 
 import {getValidationErrorMessage} from '../../../../utils/form-wizard';
@@ -37,7 +30,7 @@ const GenericPane = (props: GenericPaneProps) => {
         <TextField
           label={'Secret'}
           value={props.form.formInputs.secret.value as string}
-          onChange={(evt: React.ChangeEvent<HTMLInputElement>) => onInputChange(props.form, evt)}
+          onChange={evt => onInputChange(props.form, evt)}
           name={'secret'}
           fullHeight
           margin={'0 0 10px 0'}

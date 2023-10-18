@@ -1,18 +1,31 @@
 {
-  "extends": "../../../tsconfig.json",
   "compilerOptions": {
-    "baseUrl": ".",
+    "allowSyntheticDefaultImports": true,
+    "target": "esnext",
     "lib": [
       "dom",
-      "dom.iterable"
+      "dom.iterable",
+      "esnext"
     ],
+    "noImplicitAny": true,
+    "allowJs": true,
+    "skipLibCheck": true,
+    "strict": true,
+    "forceConsistentCasingInFileNames": true,
+    "noEmit": true,
+    "incremental": true,
+    "esModuleInterop": true,
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "resolveJsonModule": true,
+    "isolatedModules": false,
+    "sourceMap": true,
+    "baseUrl": ".",
     "jsx": "preserve"
   },
   "include": [
     "src/**/*.ts",
     "src/**/*.tsx",
-    "global.d.ts",
-    "src/yggio-connected-components/device-view-pane/styled.js",
-    "mqtt-types.d.ts"
+    "global.d.ts"
   ]
 }

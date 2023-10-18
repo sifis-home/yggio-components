@@ -1,11 +1,4 @@
 /*
- * Copyright 2022 Sensative AB
- * 
- * This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at https://mozilla.org/MPL/2.0/.
- */
-/*
 ################# TODO START: Implement support for charts #################
 
 import {devicesRequests} from '../../../api';
@@ -37,7 +30,7 @@ const Charts = props => {
     axis: 'left',
   };
   const fieldsQuery = useQuery(
-    ['devices', deviceId, 'statistics', 'fields'],
+    ['statisticsFields', deviceId],
     async () => devicesRequests.getStatisticsFields(deviceId),
     {refetchOnWindowFocus: false}
   );
@@ -49,7 +42,7 @@ const Charts = props => {
             <Select
               label={'Field1'}
               options={_.map(fieldsQuery.data, field => ({value: field, label: field}))}
-              onChange={(evt: React.ChangeEvent<HTMLInputElement>) => (
+              onChange={evt => (
                 state.setInputValue('field1', evt.target.value)
               )}
               value={state.formInputs.field1.value as string}
@@ -68,7 +61,7 @@ const Charts = props => {
             <Select
               label={'Field2'}
               options={_.map(fieldsQuery.data, field => ({value: field, label: field}))}
-              onChange={(evt: React.ChangeEvent<HTMLInputElement>) => (
+              onChange={evt => (
                 state.setInputValue('field2', evt.target.value)
               )}
               value={state.formInputs.field2.value as string}

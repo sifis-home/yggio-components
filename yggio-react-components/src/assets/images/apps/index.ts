@@ -1,10 +1,3 @@
-/*
- * Copyright 2022 Sensative AB
- * 
- * This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at https://mozilla.org/MPL/2.0/.
- */
 import nodeRed from './node-red';
 import grafana from './grafana';
 import ruleEngine from './rule-engine';
@@ -18,6 +11,7 @@ import leanheat from './leanheat';
 import powerBi from './power-bi';
 import smartVisualizer from './smart-visualizer';
 import deviceUpdater from './device-updater';
+import noodl from './noodl';
 
 export default {
   nodeRed,
@@ -33,4 +27,5 @@ export default {
   powerBi,
   smartVisualizer,
   deviceUpdater,
+  noodl,
 };

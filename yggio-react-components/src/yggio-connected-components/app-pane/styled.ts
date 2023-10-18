@@ -1,10 +1,3 @@
-/*
- * Copyright 2022 Sensative AB
- * 
- * This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at https://mozilla.org/MPL/2.0/.
- */
 import styled from 'styled-components';
 
 const NotFoundNote = styled.p`
@@ -54,9 +47,10 @@ const TopMiddleSection = styled.div`
 
 const TopRightSection = styled.div`
   width: 200px;
+  height: 120px;
   display: flex;
   align-items: center;
-  justify-content: right;
+  flex-direction: column;
 `;
 
 const AppName = styled.p`
@@ -71,7 +65,7 @@ const AppName = styled.p`
 const AppTagline = styled.p`
   margin: 0;
   font-size: 13px;
-  margin: 0 0 12px 0;
+  margin: 0 0 8px 0;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -79,6 +73,7 @@ const AppTagline = styled.p`
 
 const TagsContainer = styled.div`
   display: flex;
+  flex-wrap: wrap;
   overflow-x: hidden;
 `;
 

@@ -1,10 +1,3 @@
-/*
- * Copyright 2022 Sensative AB
- * 
- * This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at https://mozilla.org/MPL/2.0/.
- */
 interface Source {
   sourceId: string;
   path: string;
@@ -57,7 +50,7 @@ interface CalculationValue {
 type Calculations = Calculation[];
 type IdKeyedCalculations = {[_id: string]: Calculation};
 
-export {
+export type {
   CalcType,
   Interval,
   Calculate,

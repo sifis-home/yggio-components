@@ -1,18 +1,14 @@
-/*
- * Copyright 2022 Sensative AB
- * 
- * This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at https://mozilla.org/MPL/2.0/.
- */
 import {NextRouter} from 'next/router';
 import React from 'react';
 import {useQueryClient} from '@tanstack/react-query';
 import {Flex, Center, Heading, HStack, Box, Text} from '@chakra-ui/react';
-import {ic_error as errorIcon} from 'react-icons-kit/md/ic_error';
-import {ic_check_circle as checkCircleIcon} from 'react-icons-kit/md/ic_check_circle';
-import Icon from 'react-icons-kit';
+import {
+  MdErrorOutline as ErrorIcon,
+  MdCheck as CheckIcon,
+} from 'react-icons/md';
 import _ from 'lodash';
+import {useTranslation} from 'react-i18next';
+
 import {Devices} from '../../../../types';
 import {CenteredPage} from '../../../../global/components';
 import {
@@ -24,8 +20,9 @@ import Button from '../../../../components/button';
 import ContainerBox from '../../../../components/container-box';
 import Spinner from '../../../../components/spinner';
 import TextField from '../../../../components/text-field';
+import TextArea from '../../../../components/text-area';
 import Select from '../../../../components/select';
-import {channelsApi} from '../../../../api';
+import {channelsApi, devicesApi} from '../../../../api';
 import {channelState} from './state';
 import {useLocalState} from '../../../../hooks';
 import {COLORS} from '../../../../constants';
@@ -36,9 +33,8 @@ interface ChannelsProps {
   router: NextRouter;
   selectedDevices: string[];
   devices: Devices;
-  t: (key: string) => string;
   setSelectedDevices: (devices: string[]) => void;
-  setSelectMode: (selectMode: boolean) => void;
+  setIsInSelectMode: (selectMode: boolean) => void;
   setPage: (page: string) => void;
 }
 
@@ -56,6 +52,7 @@ const ChannelsResult = (props: ChannelsProps) => {
   /*
     Hooks
   */
+  const {t} = useTranslation();
   const queryClient = useQueryClient();
   const useCreateChannelsMutation = channelsApi.useCreateChannels(queryClient);
   const channelForm = useLocalState(channelState);
@@ -63,42 +60,28 @@ const ChannelsResult = (props: ChannelsProps) => {
     recipient,
     url,
     protocol,
-    topic,
     name,
     type,
     connectionString,
   } = channelForm.formInputs;
 
+  const deltaControlsConnectorsQuery = devicesApi.useConnectorDevicesQuery('DeltaControlsEnteliWeb');
+
   /*
     Event handlers
   */
   const createChannels = () => {
-    const channels = _.map(props.selectedDevices, (device: string) => {
+    const channels = _.map(props.selectedDevices, (iotnode: string) => {
       return {
         name: name.value as string,
-        [protocol.value as string]: createProtocolData({
-          protocol: protocol.value as string,
-          url: url?.value as {value: string, validation: {message: string, isValid: boolean}},
-          connectionString: connectionString?.value as string,
-          type: type?.value as string,
-          recipient: recipient?.value as string,
-        }),
-        iotnode: device,
-        topic: topic.value as string,
+        iotnode,
+        [protocol.value as string]: createProtocolData(channelForm.formInputs),
       };
     });
-
     useCreateChannelsMutation.mutate(channels);
   };
 
-  const isValidChannel = validateChannel({
-    protocol: protocol.value as string,
-    url: url as {value: string, validation: {message: string, isValid: boolean}},
-    name: name.value as string,
-    connectionString: connectionString.value as string,
-    type: type.value as string,
-    recipient: recipient.value as string,
-  });
+  const isValidChannel = validateChannel(channelForm.formInputs);
 
 
   if (useCreateChannelsMutation.isLoading) {
@@ -122,8 +105,8 @@ const ChannelsResult = (props: ChannelsProps) => {
         <Text m='0 0 40px 0' size='sm'>The channels installation finished with the following result</Text>
         {inserted && (
           <Flex alignItems='center'>
-            <Box color={COLORS.greenMedium} m='5px'>
-              <Icon size={'20'} icon={checkCircleIcon as object} />
+            <Box m='5px'>
+              <CheckIcon color={COLORS.greenMedium} />
             </Box>
             <Text fontSize='sm'>Successfull: <b>{_.size(inserted)} / {_.size(props.selectedDevices)}</b></Text>
           </Flex>
@@ -131,8 +114,8 @@ const ChannelsResult = (props: ChannelsProps) => {
         {!_.isEmpty(errors) && (
           <>
             <Flex alignItems='center'>
-              <Box color={COLORS.red} m='5px'>
-                <Icon size={'20'} icon={errorIcon as object} />
+              <Box m='5px'>
+                <ErrorIcon color={COLORS.red} />
               </Box>
               <Text fontSize='sm'>
                 Errors: <b>{_.size(errors)} / {_.size(props.selectedDevices)}</b>
@@ -182,7 +165,7 @@ const ChannelsResult = (props: ChannelsProps) => {
             disabled={!isValidChannel}
             width={'200px'}
             onClick={() => {
-              props.setSelectMode(false);
+              props.setIsInSelectMode(false);
               props.setSelectedDevices([]);
               props.setPage('default');
             }}
@@ -210,20 +193,21 @@ const ChannelsResult = (props: ChannelsProps) => {
         placeholder={'Name...'}
         name={'name'}
         value={name?.value as string}
-        onChange={(evt: React.ChangeEvent<HTMLInputElement>) => channelForm.setInputValue('name', evt.target.value)}
+        onChange={evt => channelForm.setInputValue('name', evt.target.value)}
       />
       <Select
         label={'Protocol'}
         margin={'10px 0 30px'}
-        placeholder={_.capitalize(props.t('placeholders.select'))}
+        placeholder={_.capitalize(t('placeholders.select'))}
         name={'protocol'}
         options={[
           {value: 'mqtt', label: 'MQTT'},
           {value: 'http', label: 'HTTP'},
           {value: 'azureIotHub', label: 'Azure IoT Hub'},
+          {value: 'deltaControls', label: 'Delta Controls'},
         ]}
         value={protocol?.value as string}
-        onChange={(evt: React.ChangeEvent<HTMLInputElement>) => channelForm.setInputValue('protocol', evt.target.value)}
+        onChange={evt => channelForm.setInputValue('protocol', evt.target.value)}
       />
 
       {protocol.value === 'mqtt' && (
@@ -239,7 +223,7 @@ const ChannelsResult = (props: ChannelsProps) => {
               {value: 'basicCredentialsSet', label: 'basicCredentialsSet'},
             ]}
             value={type?.value as string}
-            onChange={(evt: React.ChangeEvent<HTMLInputElement>) => channelForm.setInputValue('type', evt.target.value)}
+            onChange={evt => channelForm.setInputValue('type', evt.target.value)}
           />
           <TextField
             validationErrorMessage={recipient.value ? recipient.validation.message : ''}
@@ -248,7 +232,7 @@ const ChannelsResult = (props: ChannelsProps) => {
             placeholder={'recipient...'}
             name={'recipient'}
             value={recipient?.value as string}
-            onChange={(evt: React.ChangeEvent<HTMLInputElement>) => channelForm.setInputValue('recipient', evt.target.value)}
+            onChange={evt => channelForm.setInputValue('recipient', evt.target.value)}
           />
         </>
       )}
@@ -262,7 +246,7 @@ const ChannelsResult = (props: ChannelsProps) => {
             placeholder={'URL...'}
             name={'url'}
             value={url?.value as string}
-            onChange={(evt: React.ChangeEvent<HTMLInputElement>) => channelForm.setInputValue('url', evt.target.value)}
+            onChange={evt => channelForm.setInputValue('url', evt.target.value)}
           />
         </>
       )}
@@ -275,19 +259,38 @@ const ChannelsResult = (props: ChannelsProps) => {
             placeholder={'connection string...'}
             name={'connectionString'}
             value={connectionString?.value as string}
-            onChange={(evt: React.ChangeEvent<HTMLInputElement>) => channelForm.setInputValue('connectionString', evt.target.value)}
+            onChange={evt => channelForm.setInputValue('connectionString', evt.target.value)}
+          />
+        </>
+      )}
+
+      {protocol.value === 'deltaControls' && (
+        <>
+          <Select
+            label={'Connector'}
+            options={_.map(deltaControlsConnectorsQuery.data, device => ({
+              value: device._id,
+              label: device.name || 'no-name',
+            }))}
+            value={channelForm.formInputs.connector.value as string}
+            onChange={evt => channelForm.setInputValue('connector', evt.target.value)}
+          />
+          <TextArea
+            label='Delta Controls settings'
+            value={channelForm.formInputs.deltaControlsSettings.value as string}
+            onChange={evt => channelForm.setInputValue('deltaControlsSettings', evt.target.value)}
+            validationErrorMessage={channelForm.formInputs.deltaControlsSettings.validation.message}
+            validationSuccessMessage={channelForm.formInputs.deltaControlsSettings.validation.isValid ? 'Valid!' : null}
+            height='280px'
+            margin={'15px 0 30px 0'}
           />
         </>
       )}
 
       <FlexSpaceBetweenWrapper>
         <Button
-          content={_.capitalize(props.t('labels.cancel'))}
-          onClick={() => {
-            props.setSelectMode(false);
-            props.setSelectedDevices([]);
-            props.setPage('default');
-          }}
+          content={_.capitalize(t('labels.cancel'))}
+          onClick={() => props.setPage('default')}
           ghosted
           width={'120px'}
           height={'30px'}

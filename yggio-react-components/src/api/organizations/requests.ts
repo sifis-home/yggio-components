@@ -1,43 +1,36 @@
-/*
- * Copyright 2022 Sensative AB
- * 
- * This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at https://mozilla.org/MPL/2.0/.
- */
 import {request} from '../request';
 import {HTTP_METHODS, RESOURCE_TYPES} from '../../constants';
 import {
   Organization,
+  OrganizationUnit,
   Organizations,
+  DeviceDetail,
 } from '../../types';
 
 const fetch = async () => request<Organizations>({
-  method: HTTP_METHODS.Get,
+  method: HTTP_METHODS.get,
   URI: RESOURCE_TYPES.organizations,
 });
 
 const fetchOne = async (orgId: string) => request<Organization>({
-  method: HTTP_METHODS.Get,
-  URI: RESOURCE_TYPES.organizations,
-  params: {orgId},
+  method: HTTP_METHODS.get,
+  URI: `${RESOURCE_TYPES.organizations}/${orgId}`,
 });
 
 const create = async (data: Organization) => request<Organization>({
-  method: HTTP_METHODS.Post,
+  method: HTTP_METHODS.post,
   URI: RESOURCE_TYPES.organizations,
   data,
 });
 
 interface UpdateTemplate {
   orgId: string;
-  updates: Partial<Organization>;
+  updates: Pick<Organization, 'name' | 'description'>;
 }
 
 const update = async ({orgId, updates}: UpdateTemplate) => request<Organization>({
-  method: HTTP_METHODS.Put,
-  URI: RESOURCE_TYPES.organizations,
-  params: {orgId},
+  method: HTTP_METHODS.put,
+  URI: `${RESOURCE_TYPES.organizations}/${orgId}`,
   data: updates,
 });
 
@@ -48,36 +41,48 @@ interface RemovalTemplate {
 }
 
 const remove = async ({orgId, unitId}: RemovalTemplate) => request({
-  method: HTTP_METHODS.Delete,
+  method: HTTP_METHODS.delete,
   URI: RESOURCE_TYPES.organizations,
   params: {orgId, unitId},
 });
 
-interface UnitTemplate {
+interface CreateUnitTemplate {
   orgId: string;
   parentUnitId: string;
-  template: Partial<Organization>;
+  template: Pick<OrganizationUnit, 'name' | 'description'>;
 }
 
-const createUnit = async ({orgId, parentUnitId, template}: UnitTemplate) => request({
-  method: HTTP_METHODS.Post,
+const createUnit = async ({orgId, parentUnitId, template}: CreateUnitTemplate) => request({
+  method: HTTP_METHODS.post,
   URI: `${RESOURCE_TYPES.organizations}/${orgId}/units/${parentUnitId}`,
   data: template,
 });
 
+interface UpdateUnitTemplate {
+  orgId: string;
+  unitId: string;
+  template: Pick<OrganizationUnit, 'name' | 'description'>;
+}
+
+const updateUnit = async ({orgId, unitId, template}: UpdateUnitTemplate) => request({
+  method: HTTP_METHODS.put,
+  URI: `${RESOURCE_TYPES.organizations}/${orgId}/units/${unitId}`,
+  data: template,
+});
+
 const deleteUnit = async ({orgId, unitId}: {orgId: string, unitId: string}) => request({
-  method: HTTP_METHODS.Delete,
+  method: HTTP_METHODS.delete,
   URI: `${RESOURCE_TYPES.organizations}/${orgId}/units/${unitId}`,
 });
 
 const createMember = async ({orgId, updates}: UpdateTemplate) => request({
-  method: HTTP_METHODS.Post,
+  method: HTTP_METHODS.post,
   URI: `${RESOURCE_TYPES.organizations}/${orgId}/members`,
   data: updates,
 });
 
 const fetchMembers = async ({orgId}: {orgId: string}) => request({
-  method: HTTP_METHODS.Get,
+  method: HTTP_METHODS.get,
   URI: `${RESOURCE_TYPES.organizations}/${orgId}/members`,
 });
 
@@ -88,22 +93,24 @@ interface IdTemplate {
 }
 
 const moveMember = async ({orgId, memberId, unitId}: IdTemplate) => request({
-  method: HTTP_METHODS.Put,
+  method: HTTP_METHODS.put,
   URI: `${RESOURCE_TYPES.organizations}/${orgId}/members/${memberId}/units/${unitId}`,
 });
 
-const fetchDeviceDetails = async ({orgId}: {orgId: string}) => request({
-  method: HTTP_METHODS.Get,
+const fetchDeviceDetails = async ({
+  orgId
+}: {orgId: string}) => request<{deviceDetails: DeviceDetail[]}>({
+  method: HTTP_METHODS.get,
   URI: `${RESOURCE_TYPES.organizations}/${orgId}/deviceDetails`,
 });
 
 const assignManagerAccess = async ({orgId, memberId, unitId}: IdTemplate) => request({
-  method: HTTP_METHODS.Post,
+  method: HTTP_METHODS.post,
   URI: `${RESOURCE_TYPES.organizations}/${orgId}/members/${memberId}/units/${unitId}/managers`,
 });
 
 const revokeManagerAccess = async ({orgId, memberId, unitId}: IdTemplate) => request({
-  method: HTTP_METHODS.Delete,
+  method: HTTP_METHODS.delete,
   URI: `${RESOURCE_TYPES.organizations}/${orgId}/members/${memberId}/units/${unitId}/managers`,
 });
 
@@ -117,7 +124,7 @@ const assignDeviceAccess = async ({
   unitId,
   accessType,
 }: AccessTypeTemplate) => request({
-  method: HTTP_METHODS.Post,
+  method: HTTP_METHODS.post,
   URI: `${RESOURCE_TYPES.organizations}/${orgId}/members/${memberId}/units/${unitId}/deviceTokens`,
   data: {accessType},
 });
@@ -128,7 +135,7 @@ const revokeDeviceAccess = async ({
   unitId,
   accessType,
 }: AccessTypeTemplate) => request({
-  method: HTTP_METHODS.Delete,
+  method: HTTP_METHODS.delete,
   URI: `${RESOURCE_TYPES.organizations}/${orgId}/members/${memberId}/units/${unitId}/deviceTokens`,
   data: {accessType},
 });
@@ -140,6 +147,7 @@ export {
   update,
   remove,
   createUnit,
+  updateUnit,
   deleteUnit,
   createMember,
   fetchMembers,

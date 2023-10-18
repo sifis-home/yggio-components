@@ -1,13 +1,11 @@
-/*
- * Copyright 2022 Sensative AB
- * 
- * This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at https://mozilla.org/MPL/2.0/.
- */
 import _ from 'lodash';
 import React, {useReducer} from 'react';
 import {createActionDispatches, createStateLogger} from '../utils';
+
+/*
+  THIS HOC IS DEPRICATED!!!
+*/
+
 
 /**
  * Requires a state object containing reducer, defaultState and actions to function.

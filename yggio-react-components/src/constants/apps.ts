@@ -1,13 +1,6 @@
-/*
- * Copyright 2022 Sensative AB
- * 
- * This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at https://mozilla.org/MPL/2.0/.
- */
 import images from '../assets/images/apps';
 import {App} from '../types';
-import getExternalUrls from './external-app-urls';
+import {getExternalUrls} from './external-app-urls';
 
 const APP_TAGS = {
   visualization: 'Visualization',
@@ -106,6 +99,17 @@ const getStaticApps = (): App[] => [
     images: images.smartVisualizer,
     description: 'Smart Visualizer provides a perfect Digital Twin platform for your smart city project – offering a complete platform for visualization, and a wide selection of tools and features related to the different phases of a project. These include: planning, analyzing, dynamic real-time analysis, collaboration, crowdsourcing, informing, sharing, and finally publishing your data and projects. Smart Visualizer integrates seamlessly with Yggio to provide live IoT data in 3D models.',
   },
+  {
+    id: '57cf4076-51b1-46c0-96f9-fe60401ff309',
+    name: 'Noodl',
+    tagline: 'Low code app development platform',
+    tags: [APP_TAGS.automation, APP_TAGS.visualization],
+    url: 'https://noodl.net/yggio',
+    support: 'anders@noodl.net',
+    images: images.noodl,
+    description: 'Noodl is a next-gen low-code platform that accelerates development of web apps. A pre-integrated Yggio module + a number of templates makes development of Yggio based apps fast and cheap. If needed, Noodl also offers development and managed hosting of the app.',
+    demoUrl: 'https://yggio-dashboard.noodl-demos.com/',
+  },
 ];
 
 const getYggioApps = (): App[] => [
@@ -148,6 +152,14 @@ const getYggioApps = (): App[] => [
     tags: [APP_TAGS.visualization],
     images: images.deviceUpdater,
     url: getExternalUrls().deviceUpdater,
+  },
+  {
+    id: '57cf4076-51b1-46c0-96f9-fe60401ff996',
+    name: 'Strips Battery Calculator',
+    tagline: 'Calculate approximate battery life for Strips',
+    tags: [APP_TAGS.hardware],
+    images: images.stripsConfig,
+    url: getExternalUrls().stripsBatteryCalculator,
   },
 ];
 

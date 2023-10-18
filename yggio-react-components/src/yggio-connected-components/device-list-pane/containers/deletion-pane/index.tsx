@@ -1,57 +1,71 @@
-/*
- * Copyright 2022 Sensative AB
- * 
- * This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at https://mozilla.org/MPL/2.0/.
- */
 import React from 'react';
 import _ from 'lodash';
-import {useQueryClient} from '@tanstack/react-query';
-import {NextRouter} from 'next/router';
-import {IdKeyedDevices} from '../../../../types';
+import toast from 'react-hot-toast';
+import {useQueryClient, useMutation} from '@tanstack/react-query';
+import {useTranslation} from 'react-i18next';
+
+// Logic
+import {jobTypes} from 'yggio-types';
+import {useLocalState} from '../../../../hooks';
+import {navigationState} from './state';
+import {jobRequests, jobApi} from '../../../../api';
+import {STEPS, STEPS_NAMES} from './constants';
+import {getRequestErrorMessage} from '../../../../utils';
+
+// UI
 import {CenteredPage} from '../../../../global/components';
 import StepProgressBar from '../../../../components/step-progress-bar';
 import Button from '../../../../components/button';
-import {useLocalState} from '../../../../hooks';
-import {navigationState} from './state';
 import ContainerBox from '../../../../components/container-box';
-import {DeletionButtonContainer, TextSpan, ConfirmationContainer} from './styled';
-import {jobApi} from '../../../../api';
-import {FlexColWrapper} from '../../../../global/styled';
-import ProgressBar from '../../../../components/progress-bar';
+import BatchOperationView from '../../../batch-operation-view';
+import {DeletionButtonContainer, ConfirmationContainer} from './styled';
 import InfoBox from '../../../../components/info-box';
-import {STEPS, STEPS_NAMES} from './constants';
 
 interface DeletionProps {
   selectedDevices: string[];
-  devices: IdKeyedDevices;
-  router: NextRouter;
   setSelectedDevices(devices: string[]): void;
-  setSelectMode(selectMode: boolean): void;
+  setIsInSelectMode(selectMode: boolean): void;
   setPage(page: string): void;
-  t(key: string): string;
+  resetListState(): void;
 }
 
 const Deletion = (props: DeletionProps) => {
-  const [jobId, setJobId] = React.useState('');
-  const queryClient = useQueryClient();
-
-  const deviceRemovalJobmutation = jobApi.useRemoveDevicesJob(queryClient);
+  const {t} = useTranslation();
 
   const navState = useLocalState(navigationState);
 
+  const [jobId, setJobId] = React.useState('');
+
+  const queryClient = useQueryClient();
+
+  const removeDevicesJobMutation = useMutation(
+    async (deviceIds: string[]) => jobRequests.removeDevicesJob(deviceIds),
+    {
+      onSuccess: async (job: jobTypes.Job) => {
+        await queryClient.invalidateQueries(['job']);
+        setJobId(job._id);
+      },
+      onError: (err: Error) => {
+        toast.error(getRequestErrorMessage(err));
+      },
+    }
+  );
+
   const jobQuery = jobApi.useJob(jobId);
 
-  const sendRemoveDevicesJob = async () => {
-    const result = await deviceRemovalJobmutation.mutateAsync(props.selectedDevices);
-    setJobId(result._id);
+  const onDoneClick = async () => {
+    await queryClient.invalidateQueries(['devices']);
+    props.resetListState();
+    setJobId('');
+    props.setIsInSelectMode(false);
+    props.setSelectedDevices([]);
+    props.setPage('default');
   };
 
   return (
     <CenteredPage>
       <StepProgressBar
-        title={'Device removal'}
+        title={'Remove many devices'}
         steps={_.map(STEPS, 'progressBarTitle')}
         currentStep={navState.currentStep + 1}
         margin={'0 0 9px 0'}
@@ -62,30 +76,26 @@ const Deletion = (props: DeletionProps) => {
           [STEPS_NAMES.confirmation]: (
             <>
               <ConfirmationContainer>
+                <p>
+                  Press continue if you are sure you want to remove the <b>{_.size(props.selectedDevices)}</b> devices
+                </p>
                 <InfoBox
                   type={'error'}
-                  heading={'This action will permanently remove all selected devices.'}
+                  heading={'This action will permanently delete the selected devices'}
+                  margin={'20px 0 0 0'}
                 />
-                <p>
-                  Press continue if you are sure you want to remove&nbsp;
-                  <b>{_.size(props.selectedDevices)}</b>&nbsp;devices.
-                </p>
               </ConfirmationContainer>
               <DeletionButtonContainer>
                 <Button
-                  content={_.capitalize(props.t('labels.cancel'))}
+                  content={_.capitalize(t('labels.cancel'))}
                   ghosted
-                  onClick={() => {
-                    props.setSelectMode(false);
-                    props.setSelectedDevices([]);
-                    props.setPage('default');
-                  }}
+                  onClick={() => props.setPage('default')}
                 />
                 <Button
                   color={'green'}
-                  content={_.capitalize(props.t('labels.continue'))}
+                  content={_.capitalize(t('labels.continue'))}
                   onClick={() => {
-                    void sendRemoveDevicesJob();
+                    removeDevicesJobMutation.mutate(props.selectedDevices);
                     navState.incrementCurrentStep();
                   }}
                 />
@@ -93,57 +103,14 @@ const Deletion = (props: DeletionProps) => {
             </>
           ),
           [STEPS_NAMES.summary]: (
-            <>
-              {
-                !jobQuery?.data?.isFinished
-                  ? <b>Removing devices..</b>
-                  : <b>Finished!</b>
-              }
-              <FlexColWrapper>
-                <p>
-                  <b>{jobQuery?.data?.numItemsDone}</b>
-                  &nbsp;of {jobQuery?.data?.numItems} devices removed
-                </p>
-                <TextSpan>{jobQuery?.data?.numSuccesses} succeeded</TextSpan>
-                <TextSpan>{jobQuery?.data?.numFailures} failures</TextSpan>
-              </FlexColWrapper>
-              <ProgressBar
-                progress={jobQuery?.data?.progressPercentage}
-                margin={'50px 0 0 0'}
-              />
-              {!jobQuery?.data?.isFinished && (
-                <p>
-                  Estimated time left:&nbsp;
-                  <b>
-                    {
-                      !_.isNil(jobQuery?.data?.expectedTimeLeftText)
-                        ? jobQuery?.data?.expectedTimeLeftText
-                        : 'Calculating..'
-                    }
-                  </b>
-                </p>
-              )}
-              <DeletionButtonContainer>
-                <Button
-                  disabled={!jobQuery?.data?.isFinished}
-                  content={_.capitalize(props.t('labels.back'))}
-                  ghosted
-                  onClick={navState.decrementCurrentStep}
-                />
-                <Button
-                  disabled={!jobQuery?.data?.isFinished}
-                  color={'green'}
-                  content={_.capitalize(props.t('labels.finish'))}
-                  onClick={async () => {
-                    await queryClient.invalidateQueries(['devices']);
-                    setJobId('');
-                    props.setSelectMode(false);
-                    props.setSelectedDevices([]);
-                    props.setPage('default');
-                  }}
-                />
-              </DeletionButtonContainer>
-            </>
+            <BatchOperationView
+              job={jobQuery.data}
+              items={_.map(props.selectedDevices, device => ({_id: device}))}
+              onDoneClick={onDoneClick}
+              progressHeading='Deleting devices...'
+              successesText='devices was successfully deleted'
+              errorsText='devices failed to get deleted'
+            />
           ),
         }[STEPS[navState.currentStep].name || 'STEP_NOT_FOUND']}
       </ContainerBox>

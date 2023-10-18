@@ -1,66 +1,59 @@
-/*
- * Copyright 2022 Sensative AB
- * 
- * This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at https://mozilla.org/MPL/2.0/.
- */
 import _ from 'lodash';
 
-interface ChannelData {
-  protocol: string;
-  url: {value: string, validation: {message: string, isValid: boolean}};
-  name: string;
-  connectionString: string;
-  type: string;
-  recipient: string;
-}
+import {parseDeltaControlsSettings} from '../../../../utils';
+import {getFormValues} from '../../../../utils/form-wizard';
+import {FormInputs} from '../../../../types';
 
-const validateChannel = ({
-  protocol,
-  url,
-  name,
-  connectionString,
-  type,
-  recipient,
-}: ChannelData) => {
+const validateChannel = (formInputs: FormInputs) => {
+  const protocol = formInputs.protocol.value as string;
   const isValidMQTTProtocol = _.every([
     _.eq(protocol, 'mqtt'),
-    type,
-    recipient,
+    formInputs.type.value,
+    formInputs.recipient.value,
   ]);
   const isValidHTTPProtocol = _.every([
     _.eq(protocol, 'http'),
-    url?.value,
-    url?.validation?.isValid,
+    formInputs.url.value,
+    formInputs.url.validation.isValid,
   ]);
   const isValidAzureIotHubProtocol = _.every([
     _.eq(protocol, 'azureIotHub'),
-    connectionString,
+    formInputs.connectionString.value,
+  ]);
+  const isValidDeltaControlsProtocol = _.every([
+    _.eq(protocol, 'deltaControls'),
+    formInputs.connector.value,
+    formInputs.deltaControlsSettings.validation.isValid,
   ]);
 
   const isValidProtocol = _.some([
     isValidMQTTProtocol,
     isValidHTTPProtocol,
     isValidAzureIotHubProtocol,
+    isValidDeltaControlsProtocol,
   ]);
 
   return _.every([
-    name,
+    formInputs.name.value,
     isValidProtocol,
   ]);
 };
 
-const createProtocolData = ({
-  protocol,
-  url,
-  connectionString,
-  type,
-  recipient,
-}: Omit<ChannelData, 'name'>) => {
+const createProtocolData = (formInputs: FormInputs) => {
+  const formValues = getFormValues(formInputs);
+  const {
+    protocol,
+    url,
+    type,
+    recipient,
+    connectionString,
+    connector,
+    deltaControlsSettings,
+  } = formValues;
+
   if (protocol === 'http') {
     return {
-      url,
+      url
     };
   }
 
@@ -74,6 +67,13 @@ const createProtocolData = ({
   if (protocol === 'azureIotHub') {
     return {
       connectionString,
+    };
+  }
+
+  if (protocol === 'deltaControls') {
+    return {
+      connectorId: connector,
+      mappings: parseDeltaControlsSettings(deltaControlsSettings),
     };
   }
 };

@@ -1,10 +1,3 @@
-/*
- * Copyright 2022 Sensative AB
- * 
- * This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at https://mozilla.org/MPL/2.0/.
- */
 import React from 'react';
 import _ from 'lodash';
 import {
@@ -22,6 +15,7 @@ import {CurveType} from 'recharts/types/shape/Curve';
 
 import TooltipContent from './tooltip-content';
 import {Attributes, DataSerie} from '../types';
+import {Y_AXIS_FONT_SIZE} from '../constants';
 
 interface ChartProps {
   dataSeries: DataSerie[];
@@ -59,7 +53,7 @@ const Chart = (props: ChartProps) => {
           yAxisId='left'
           type={'number'}
           axisLine={false}
-          width={60}
+          tick={{fontSize: Y_AXIS_FONT_SIZE}}
           // @ts-ignore the type from recharts seems to be broken
           domain={props.attributes.yAxisDomain}
         />

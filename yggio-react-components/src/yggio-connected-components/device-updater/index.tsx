@@ -1,10 +1,3 @@
-/*
- * Copyright 2022 Sensative AB
- * 
- * This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at https://mozilla.org/MPL/2.0/.
- */
 import React, {useState} from 'react';
 import _ from 'lodash';
 import {useQuery} from '@tanstack/react-query';
@@ -40,7 +33,7 @@ const DeviceUpdater = () => {
   const [device, setDevice] = useState<Device>();
   const [deviceIsJoined, setDeviceIsJoined] = useState<boolean>();
 
-  const shouldPollDevice = _.every([device?.connector?.downlinkQueue === 'ChirpStack', !deviceIsJoined, wizardState.currentStep !== 0]);
+  const shouldPollDevice = !_.isString(device?.connector) && _.every([device?.connector?.downlinkQueue === 'ChirpStack', !deviceIsJoined, wizardState.currentStep !== 0]);
 
   const deviceQuery = useQuery(
     ['device', device?._id],

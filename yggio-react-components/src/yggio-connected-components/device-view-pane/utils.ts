@@ -1,10 +1,3 @@
-/*
- * Copyright 2022 Sensative AB
- * 
- * This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at https://mozilla.org/MPL/2.0/.
- */
 import _ from 'lodash';
 import {
   millisecondsToHours,
@@ -13,9 +6,9 @@ import {
   hoursToMilliseconds,
   minutesToMilliseconds,
 } from 'date-fns';
+import {channelTypes} from 'yggio-types';
 
 import {
-  RIGHT_TYPES,
   SPECIFIC_TAB_ITEMS,
   TAB_ITEMS,
   RULES_ACTIONS_OPTIONS,
@@ -24,12 +17,14 @@ import {
   LORA_SERVERS,
   CHIRP_STACK_COMMANDS,
 } from './constants';
-import {resolveDeviceType} from '../../utils';
+import {resolveDeviceType, parseDeltaControlsSettings} from '../../utils';
 import {DEVICE_TYPES} from '../../constants';
-import {Device, Scope, FormInputs, InputValue, Channel} from '../../types';
+import {Device, FormInputs, InputValue} from '../../types';
 
 // TODO: This is wierd and needs a refactor
-const getTabItems = (device: Device, hasRecConnector: boolean) => {
+const getTabItems = (hasRecConnector: boolean, device?: Device) => {
+  if (!device) return;
+
   const general = _.values(TAB_ITEMS);
 
   const deviceType = resolveDeviceType(device) as string;
@@ -42,15 +37,6 @@ const getTabItems = (device: Device, hasRecConnector: boolean) => {
 
   const tabItems = _.concat(general, specific, realEstateCore);
   return tabItems;
-};
-
-const createRightsList = (rights: Scope[]) => {
-  const acc: Record<string, boolean> = {};
-  return _.reduce(RIGHT_TYPES, (result, type) => {
-    const right = _.find(rights, right => _.eq(right, type));
-    result[type] = !!right;
-    return result;
-  }, acc);
 };
 
 const convertMillisecondsToHoursMinutesSeconds = (milliseconds?: number) => {
@@ -78,10 +64,15 @@ const convertMillisecondsToHoursMinutesSeconds = (milliseconds?: number) => {
   };
 };
 
-const canBeSynchronized = (device: Device) => {
+const checkDeviceIsSynchronizable = (device: Device) => {
   const hasConnector = !!device.connector;
   const isConnector = !!device.downlinkQueue;
   return hasConnector || isConnector;
+};
+
+const checkDeviceSupportsImport = (device: Device) => {
+  const {downlinkQueue} = device;
+  return downlinkQueue === 'Netmore' || downlinkQueue === 'ActilityThingpark';
 };
 
 const determineActionType = (device: Device) => {
@@ -90,11 +81,6 @@ const determineActionType = (device: Device) => {
   if (_.includes(deviceTypes, DEVICE_TYPES.lora)) {
     return 'LoraDeviceAction';
   }
-
-  // TODO: In the future we will add Z-wave support
-  // if (_.includes(deviceTypes, DEVICE_TYPES.zWave)) {
-  //   return 'ZWaveDeviceAction';
-  // }
 };
 const determineGroupName = (device: Device) => {
   const deviceType = resolveDeviceType(device) as string;
@@ -102,17 +88,13 @@ const determineGroupName = (device: Device) => {
   if (_.includes(deviceTypes, DEVICE_TYPES.lora)) {
     return 'LoRa Enhet';
   }
-
-  // TODO: In the future we will add Z-wave support
-  // if (_.includes(deviceTypes, DEVICE_TYPES.zWave)) {
-  //   return 'ZWave Enhet';
-  // }
 };
 
 const determineMessageTemplate = (device: Device) => {
   const deviceType = resolveDeviceType(device) as string;
   const deviceTypes = _.split(deviceType, ',');
   if (_.includes(deviceTypes, DEVICE_TYPES.lora)) {
+    // Are we really using fake data???
     return {
       confirmed: false,
       fPort: '123',
@@ -120,15 +102,6 @@ const determineMessageTemplate = (device: Device) => {
       reference: '',
     };
   }
-
-  // TODO: In the future we will add Z-wave support
-  // if (_.includes(deviceTypes, DEVICE_TYPES.zWave)) {
-  //   return {
-  //     act: "set",
-  //     cc: "bswitch",
-  //     value: 0,
-  //   };
-  // }
 };
 
 interface CreateRuleTemplateProps {
@@ -158,9 +131,7 @@ const createRuleTemplate = (props: CreateRuleTemplateProps) => {
 
 const createRulesActionsOptions = (deviceRules?: Record<string, string>) => {
   const options = _.filter(RULES_ACTIONS_OPTIONS, option => {
-    if (!_.includes(_.values(deviceRules), option.value)) {
-      return option;
-    }
+    return !_.includes(_.values(deviceRules), option.value);
   });
   return options;
 };
@@ -168,25 +139,40 @@ const createRulesActionsOptions = (deviceRules?: Record<string, string>) => {
 const extractChannelCreationData = (
   deviceId: string,
   formValues: Record<string, InputValue>
-): Omit<Channel, '_id'> => {
-  let protocolFields: string[] = [];
-  if (formValues.protocol === 'mqtt') {
-    protocolFields = ['type', 'recipient'];
-  }
-  if (formValues.protocol === 'http') {
-    protocolFields = ['url'];
-  }
-  if (formValues.protocol === 'azureIotHub') {
-    protocolFields = ['connectionString'];
-  }
-  if (formValues.protocol === 'desigoCC') {
-    protocolFields = ['connector', 'desigoObject'];
-  }
-  return {
+) => {
+  const data: Omit<channelTypes.Channel, '_id' | 'readableFormat'> = {
     iotnode: deviceId,
     name: formValues.name as string,
-    [formValues.protocol as string]: _.pick(formValues, protocolFields),
   };
+  if (formValues.protocol === 'mqtt') {
+    data.mqtt = {
+      type: formValues.type as string,
+      recipient: formValues.recipient as string,
+    };
+  }
+  if (formValues.protocol === 'http') {
+    data.http = {
+      url: formValues.url as string,
+    };
+  }
+  if (formValues.protocol === 'azureIotHub') {
+    data.azureIotHub = {
+      connectionString: formValues.connectionString as string,
+    };
+  }
+  if (formValues.protocol === 'desigoCC') {
+    data.desigoCC = {
+      connector: formValues.connector as string,
+      desigoObject: formValues.desigoObject as string,
+    };
+  }
+  if (formValues.protocol === 'deltaControls') {
+    data.deltaControls = {
+      connectorId: formValues.connector as string,
+      mappings: parseDeltaControlsSettings(formValues.deltaControlsSettings),
+    };
+  }
+  return data;
 };
 
 const getDeviceLoraServer = (device: Device) => {
@@ -249,9 +235,9 @@ const getFlushQueueRequestData = (device: Device, server: LORA_SERVERS) => {
 
 export {
   getTabItems,
-  createRightsList,
   convertMillisecondsToHoursMinutesSeconds,
-  canBeSynchronized,
+  checkDeviceIsSynchronizable,
+  checkDeviceSupportsImport,
   createRuleTemplate,
   createRulesActionsOptions,
   extractChannelCreationData,

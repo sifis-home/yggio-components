@@ -1,22 +1,16 @@
-/*
- * Copyright 2022 Sensative AB
- * 
- * This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at https://mozilla.org/MPL/2.0/.
- */
+import React from 'react';
 import Head from 'next/head';
 import dynamic from 'next/dynamic';
 import {useRouter} from 'next/router';
 
 const DynamicDashboard = dynamic(
   () => import('yggio-react-components').then(mod => {
-    return mod.Dashboard;
+    return mod.DashboardPane;
   }),
   {ssr: false}
 );
 
-const Page = props => {
+const Page = () => {
   const router = useRouter();
   return (
     <div>

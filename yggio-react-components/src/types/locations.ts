@@ -1,10 +1,3 @@
-/*
- * Copyright 2022 Sensative AB
- * 
- * This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at https://mozilla.org/MPL/2.0/.
- */
 interface LocationItemControl {
   _id: string;
   icon?: string;
@@ -44,7 +37,7 @@ interface Location {
 type Locations = Location[];
 type IdKeyedLocations = Record<string, Location>;
 
-export {
+export type {
   LayerItem,
   Layer,
   Location,

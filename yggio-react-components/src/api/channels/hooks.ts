@@ -1,13 +1,7 @@
-/*
- * Copyright 2022 Sensative AB
- * 
- * This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at https://mozilla.org/MPL/2.0/.
- */
 import {useQuery, useMutation, QueryClient} from '@tanstack/react-query';
 import {toast} from 'react-hot-toast';
-import {Channel} from '../../types';
+import {channelTypes} from 'yggio-types';
+
 import {getRequestErrorMessage} from '../../utils';
 import {channelsRequests} from '.';
 
@@ -17,7 +11,7 @@ const useChannelsQuery = (deviceId: string) => useQuery(
 );
 
 const useCreateChannel = (queryClient: QueryClient) => useMutation(
-  async (data: Omit<Channel, '_id'>) => channelsRequests.create(data),
+  async (data: Omit<channelTypes.Channel, '_id'>) => channelsRequests.create(data),
   {
     onSuccess: async () => {
       await queryClient.invalidateQueries(['channels']);
@@ -26,7 +20,7 @@ const useCreateChannel = (queryClient: QueryClient) => useMutation(
 );
 
 const useCreateChannels = (queryClient: QueryClient) => useMutation(
-  async (data: Omit<Channel, '_id'>[]) => channelsRequests.createMany(data),
+  async (data: Omit<channelTypes.Channel, '_id' | 'readableFormat'>[]) => channelsRequests.createMany(data),
   {
     onSuccess: async () => {
       await queryClient.invalidateQueries(['channels']);

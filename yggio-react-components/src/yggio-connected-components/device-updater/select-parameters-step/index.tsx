@@ -1,14 +1,6 @@
-/*
- * Copyright 2022 Sensative AB
- * 
- * This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at https://mozilla.org/MPL/2.0/.
- */
 import React from 'react';
 import _ from 'lodash';
-import {Icon} from 'react-icons-kit';
-import {checkmark as checkIcon} from 'react-icons-kit/ionicons/checkmark';
+import {MdCheck as CheckIcon} from 'react-icons/md';
 
 import {ParametersState} from '../types';
 import {Chip} from './styled';
@@ -37,7 +29,7 @@ const SelectParametersStep = (props: SelectParametersStepProps) => {
           checked={props.parametersState.parameters.name}
         >
           {props.parametersState.parameters.name && (
-            <Icon icon={checkIcon as object} />
+            <CheckIcon />
           )}
           <p>Name</p>
         </Chip>
@@ -46,7 +38,7 @@ const SelectParametersStep = (props: SelectParametersStepProps) => {
           checked={props.parametersState.parameters.description}
         >
           {props.parametersState.parameters.description && (
-            <Icon icon={checkIcon as object} />
+            <CheckIcon />
           )}
           <p>Description</p>
         </Chip>
@@ -55,7 +47,7 @@ const SelectParametersStep = (props: SelectParametersStepProps) => {
           checked={props.parametersState.parameters.location}
         >
           {props.parametersState.parameters.location && (
-            <Icon icon={checkIcon as object} />
+            <CheckIcon />
           )}
           <p>Location</p>
         </Chip>
@@ -64,7 +56,7 @@ const SelectParametersStep = (props: SelectParametersStepProps) => {
           checked={props.parametersState.parameters.realEstateCore}
         >
           {props.parametersState.parameters.realEstateCore && (
-            <Icon icon={checkIcon as object} />
+            <CheckIcon />
           )}
           <p>Real Estate Core</p>
         </Chip>
@@ -73,7 +65,7 @@ const SelectParametersStep = (props: SelectParametersStepProps) => {
           checked={props.parametersState.parameters.contextualParameters}
         >
           {props.parametersState.parameters.contextualParameters && (
-            <Icon icon={checkIcon as object} />
+            <CheckIcon />
           )}
           <p>Contextual Parameters</p>
         </Chip>

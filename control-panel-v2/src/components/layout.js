@@ -1,19 +1,12 @@
-/*
- * Copyright 2022 Sensative AB
- * 
- * This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at https://mozilla.org/MPL/2.0/.
- */
 import React from 'react';
+import ReactDOM from 'react-dom';
 import {compose} from 'lodash/fp';
 import dynamic from 'next/dynamic';
-import {ModalProvider} from 'styled-react-modal';
 import {useRouter} from 'next/router';
 import {withChakraProvider, withQueryClientProvider} from 'yggio-react-components';
-import withTokenMonitor from '../hocs/with-token-monitor';
+
 import withAuthCheck from '../hocs/with-auth-check';
-import withYggioMessageToaster from '../hocs/with-yggio-message-toaster';
+import withToaster from '../hocs/with-toaster';
 
 const DynamicNavbarPane = dynamic(
   () => import('yggio-react-components').then(mod => mod.NavbarPane),
@@ -28,7 +21,7 @@ const DynamicWebSocket = dynamic(
 const Layout = props => {
   React.useEffect(() => {
     if (typeof window !== 'undefined' && process.env.NODE_ENV !== 'production') {
-      const ReactDOM = require('react-dom');
+      // eslint-disable-next-line global-require
       const axe = require('@axe-core/react');
       axe(React, ReactDOM, 500);
     }
@@ -42,9 +35,9 @@ const Layout = props => {
         router={router}
       >
         <DynamicWebSocket>
-          <ModalProvider>
+          <div style={{fontFamily: 'Lato'}}>
             {props.children}
-          </ModalProvider>
+          </div>
         </DynamicWebSocket>
       </DynamicNavbarPane>
   );
@@ -53,7 +46,6 @@ const Layout = props => {
 export default compose(
   withQueryClientProvider,
   withChakraProvider,
-  withYggioMessageToaster,
-  withTokenMonitor,
+  withToaster,
   withAuthCheck,
 )(Layout);

@@ -1,13 +1,8 @@
-/*
- * Copyright 2022 Sensative AB
- * 
- * This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at https://mozilla.org/MPL/2.0/.
- */
 import {useQueryClient} from '@tanstack/react-query';
 import React from 'react';
 import _ from 'lodash';
+import {useTranslation} from 'react-i18next';
+
 import {FlexColWrapper, FlexWrapper, TextParagraph, HorizontalLine, FlexSpaceBetweenWrapper} from '../../../../global/styled';
 import {Devices} from '../../../../types';
 import NumberField from '../../../../components/number-field';
@@ -22,9 +17,8 @@ import InfoBox from '../../../../components/info-box';
 interface ReportIntervalProps {
   selectedDevices: string[];
   devices: Devices;
-  t: (key: string) => string;
   setSelectedDevices: (devices: string[]) => void;
-  setSelectMode: (selectMode: boolean) => void;
+  setIsInSelectMode: (selectMode: boolean) => void;
   setPage: (page: string) => void;
 }
 
@@ -32,6 +26,7 @@ const ReportInterval = (props: ReportIntervalProps) => {
   /*
     Hooks
   */
+  const {t} = useTranslation();
   const queryClient = useQueryClient();
   const reportIntervalForm = useLocalState(reportIntervalData);
 
@@ -52,12 +47,12 @@ const ReportInterval = (props: ReportIntervalProps) => {
     const updates = {
       expectedReportInterval
     };
-    const deviceMutations = _.map(props.devices, async device => {
-      await mutateDevice({deviceId: device._id, updates});
+    const deviceMutations = _.map(props.selectedDevices, async deviceId => {
+      await mutateDevice({deviceId, updates});
     });
     await Promise.all(deviceMutations);
     props.setPage('default');
-    props.setSelectMode(false);
+    props.setIsInSelectMode(false);
     props.setSelectedDevices([]);
   };
 
@@ -82,7 +77,7 @@ const ReportInterval = (props: ReportIntervalProps) => {
               isRequired
               width={'100px'}
               value={reportIntervalForm.formInputs.hours.value as number}
-              onChange={(evt: React.ChangeEvent<HTMLInputElement>) => reportIntervalForm.setInputValue('hours', evt.target.value)}
+              onChange={evt => reportIntervalForm.setInputValue('hours', evt.target.value)}
             />
           </FlexColWrapper>
           {/* @ts-ignore - styled component not typed */}
@@ -95,7 +90,7 @@ const ReportInterval = (props: ReportIntervalProps) => {
               max={'59'}
               width={'100px'}
               value={reportIntervalForm.formInputs.minutes.value as number}
-              onChange={(evt: React.ChangeEvent<HTMLInputElement>) => reportIntervalForm.setInputValue('minutes', evt.target.value)}
+              onChange={evt => reportIntervalForm.setInputValue('minutes', evt.target.value)}
             />
           </FlexColWrapper>
           {/* @ts-ignore - styled component not typed */}
@@ -108,19 +103,15 @@ const ReportInterval = (props: ReportIntervalProps) => {
               max={'59'}
               width={'100px'}
               value={reportIntervalForm.formInputs.seconds.value as number}
-              onChange={(evt: React.ChangeEvent<HTMLInputElement>) => reportIntervalForm.setInputValue('seconds', evt.target.value)}
+              onChange={evt => reportIntervalForm.setInputValue('seconds', evt.target.value)}
             />
           </FlexColWrapper>
         </FlexWrapper>
 
         <FlexSpaceBetweenWrapper>
           <Button
-            content={_.capitalize(props.t('labels.cancel'))}
-            onClick={() => {
-              props.setSelectMode(false);
-              props.setSelectedDevices([]);
-              props.setPage('default');
-            }}
+            content={_.capitalize(t('labels.cancel'))}
+            onClick={() => props.setPage('default')}
             ghosted
             width={'120px'}
             height={'30px'}
@@ -128,7 +119,7 @@ const ReportInterval = (props: ReportIntervalProps) => {
           />
           <Button
             isLoading={isUpdatingDevice}
-            content={_.capitalize(props.t('labels.save'))}
+            content={_.capitalize(t('labels.save'))}
             onClick={handleExpectedReportInterval}
             color={'green'}
             width={'200px'}

@@ -1,10 +1,3 @@
-/*
- * Copyright 2022 Sensative AB
- * 
- * This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at https://mozilla.org/MPL/2.0/.
- */
 import _ from 'lodash';
 
 import {ConnectorInputValue} from './types';
@@ -57,6 +50,50 @@ const selectSteps = (selectedDeviceType: DEVICE_TYPES) => {
   if (selectedDeviceType === DEVICE_TYPES.lora) {
     steps.push(STEPS.lora);
   }
+  if (selectedDeviceType === DEVICE_TYPES.siemensDesigoCcConnector) {
+    steps.push(STEPS.siemensDesigoCcConnector);
+  }
+  if (selectedDeviceType === DEVICE_TYPES.chirpstackConnector) {
+    steps.push(STEPS.chirpstackConnector);
+  }
+  if (selectedDeviceType === DEVICE_TYPES.netmoreConnector) {
+    steps.push(STEPS.netmoreConnector);
+  }
+  if (selectedDeviceType === DEVICE_TYPES.actilityThingparkConnector) {
+    steps.push(STEPS.actilityThingparkConnector);
+  }
+  if (selectedDeviceType === DEVICE_TYPES.thingsNetworkConnector) {
+    steps.push(STEPS.thingsNetworkConnector);
+  }
+  if (selectedDeviceType === DEVICE_TYPES.sodaq) {
+    steps.push(STEPS.sodaq);
+  }
+  if (selectedDeviceType === DEVICE_TYPES.bleDevice) {
+    steps.push(STEPS.bleDevice);
+  }
+  if (selectedDeviceType === DEVICE_TYPES.weatherDevice) {
+    steps.push(STEPS.weatherDevice);
+  }
+  if (selectedDeviceType === DEVICE_TYPES.wirelessMBus) {
+    steps.push(STEPS.wirelessMBus);
+  }
+  if (selectedDeviceType === DEVICE_TYPES.celsiviewConnector) {
+    steps.push(STEPS.celsiviewConnector);
+  }
+  if (selectedDeviceType === DEVICE_TYPES.box2Gateway) {
+    steps.push(STEPS.box2Gateway);
+  }
+  if (selectedDeviceType === DEVICE_TYPES.klimatorRsiConnector) {
+    steps.push(STEPS.klimatorRsiConnector);
+  }
+  if (selectedDeviceType === DEVICE_TYPES.deltaControlsConnector) {
+    steps.push(STEPS.deltaControlsConnector);
+  }
+  if (selectedDeviceType === DEVICE_TYPES.loraGateway) {
+    steps.push(STEPS.loraGateway);
+  }
+  steps.push(STEPS.deviceModelName);
+  steps.push(STEPS.translator);
   steps.push(STEPS.details);
   steps.push(STEPS.result);
   return steps;

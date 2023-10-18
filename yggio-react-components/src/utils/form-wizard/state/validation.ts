@@ -1,10 +1,3 @@
-/*
- * Copyright 2022 Sensative AB
- * 
- * This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at https://mozilla.org/MPL/2.0/.
- */
 import _ from 'lodash';
 
 import {
@@ -66,7 +59,7 @@ const validateInputValue = (
   let validationMessage = null;
   _.forEach(validators, validator => {
     // Object validator
-    if (_.isPlainObject(validator)) {
+    if (typeof validator === 'object') {
       const valid = validator.validate(value, formInputs);
       if (!valid) {
         isValid = false;
@@ -79,7 +72,7 @@ const validateInputValue = (
       }
     }
     // Function validator
-    if (_.isFunction(validator)) {
+    if (typeof validator === 'function') {
       try {
         validator(value, formInputs);
       } catch (error: unknown) {

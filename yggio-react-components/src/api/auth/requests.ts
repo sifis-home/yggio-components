@@ -1,10 +1,3 @@
-/*
- * Copyright 2022 Sensative AB
- * 
- * This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at https://mozilla.org/MPL/2.0/.
- */
 import {request} from '../request';
 
 import {
@@ -22,7 +15,7 @@ interface AuthInfo {
 }
 
 const getAuthInfo = async () => request<AuthInfo>({
-  method: HTTP_METHODS.Get,
+  method: HTTP_METHODS.get,
   URI: `${RESOURCE_TYPES.auth}/info`,
 });
 
@@ -35,7 +28,7 @@ const getAuthCode = async ({
   clientId,
   redirectionEndpoint,
 }: AuthCodeProps) => request<AuthCode>({
-  method: HTTP_METHODS.Get,
+  method: HTTP_METHODS.get,
   URI: `${RESOURCE_TYPES.auth}/code`,
   params: {
     code,
@@ -47,7 +40,7 @@ const getAuthCode = async ({
 });
 
 const getTokenUser = async () => request({
-  method: HTTP_METHODS.Get,
+  method: HTTP_METHODS.get,
   URI: `${RESOURCE_TYPES.users}/me`,
 });
 

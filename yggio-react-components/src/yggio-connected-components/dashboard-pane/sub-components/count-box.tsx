@@ -1,23 +1,13 @@
-/*
- * Copyright 2022 Sensative AB
- * 
- * This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at https://mozilla.org/MPL/2.0/.
- */
 import React from 'react';
-import Icon from 'react-icons-kit';
+import type {IconType} from 'react-icons';
 import {UseQueryResult} from '@tanstack/react-query';
 
 import Spinner from '../../../components/spinner';
-import {
-  CountBoxContainer,
-  IconContainer,
-} from '../styled';
+import {CountBoxContainer} from '../styled';
 
 interface CountBoxProps {
   title: string;
-  icon: object;
+  icon: IconType;
   iconSize: number,
   query: UseQueryResult;
   onClick: () => void;
@@ -25,9 +15,7 @@ interface CountBoxProps {
 
 const CountBox = (props: CountBoxProps) => (
   <CountBoxContainer onClick={props.onClick}>
-    <IconContainer>
-      <Icon icon={props.icon} size={props.iconSize} />
-    </IconContainer>
+    <props.icon size={props.iconSize} color='#3C7D44' style={{margin: '0 20px'}} />
     {props.query?.isLoading
       ? <Spinner color={'#555'} />
       : (

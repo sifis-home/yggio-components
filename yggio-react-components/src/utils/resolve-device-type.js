@@ -1,10 +1,3 @@
-/*
- * Copyright 2022 Sensative AB
- * 
- * This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at https://mozilla.org/MPL/2.0/.
- */
 import fp from 'lodash/fp';
 import {DEVICE_TYPES} from '../constants';
 
@@ -61,6 +54,24 @@ const isActilityThingparkDevice = device => {
   return isActilityThingparkDevice && DEVICE_TYPES.actilityThingpark;
 };
 
+const isBleDevice = device => {
+  const hasBleConnector = device?.connector?.downlinkQueue === 'bleGateway';
+  const isBleDevice = hasTruthy([hasBleConnector]);
+  return isBleDevice && DEVICE_TYPES.bleDevice;
+};
+
+const isWeatherDevice = device => {
+  const hasWeatherConnector = device?.connector?.downlinkQueue === 'open-weather-map';
+  const isWeatherDevice = hasTruthy([hasWeatherConnector]);
+  return isWeatherDevice && DEVICE_TYPES.weatherNode;
+};
+
+const isLoraGatewayDevice = device => {
+  const hasGatewayEui = !!device?.gatewayEui;
+  const isLoraGatewayDevice = hasTruthy([hasGatewayEui]);
+  return isLoraGatewayDevice && DEVICE_TYPES.loraGateway;
+};
+
 const typeCreators = [
   isBox2Type,
   isLoRaType,
@@ -70,6 +81,9 @@ const typeCreators = [
   isChirpStackDevice,
   isNetmoreDevice,
   isActilityThingparkDevice,
+  isBleDevice,
+  isWeatherDevice,
+  isLoraGatewayDevice,
 ];
 
 // TODO: This should return a array instead of a comma separated string

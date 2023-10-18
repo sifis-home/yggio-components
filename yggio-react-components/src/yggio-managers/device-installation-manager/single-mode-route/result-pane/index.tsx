@@ -1,15 +1,8 @@
-/*
- * Copyright 2022 Sensative AB
- * 
- * This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at https://mozilla.org/MPL/2.0/.
- */
 import React from 'react';
 import {NextRouter} from 'next/router';
 import {Box} from '@chakra-ui/react';
-import Icon from 'react-icons-kit';
-import {ic_check_circle_outline as checkCircleIcon} from 'react-icons-kit/md/ic_check_circle_outline';
+import {MdCheckCircle as CheckCircleIcon} from 'react-icons/md';
+
 import Button from '../../../../components/button';
 import InfoBox from '../../../../components/info-box';
 import {
@@ -20,7 +13,7 @@ import {UpdateLocationMutation} from '../types';
 import {FormInputs} from '../../../../types';
 import {NavButtonsContainer} from '../../styled';
 import {StyledContainerBox} from '../../sub-components';
-import COLORS from '../../../../constants/colors';
+import {COLORS} from '../../../../constants';
 
 interface ResultPaneProps {
   router: NextRouter;
@@ -33,7 +26,7 @@ const ResultPane = (props: ResultPaneProps) => {
     <StyledContainerBox>
       <ContentContainer>
         <Box color={COLORS.greenAlt}>
-          <Icon size={'90'} icon={checkCircleIcon as object} />
+          <CheckCircleIcon size={70} />
         </Box>
         <SuccessMessage>Device was added successfully</SuccessMessage>
         {props.updateLocationMutation.isError && (

@@ -1,10 +1,3 @@
-/*
- * Copyright 2022 Sensative AB
- * 
- * This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at https://mozilla.org/MPL/2.0/.
- */
 import _ from 'lodash';
 import {useQuery, useMutation, QueryClient} from '@tanstack/react-query';
 import {Rules, RuleCreationTemplate} from '../../types/rules';
@@ -48,7 +41,7 @@ const useRemoveRule = (queryClient: QueryClient) => useMutation(
 
 const useActivateRule = () => useMutation(
   ['rule', 'activation'],
-  async (ruleId: string) => rulesRequests.activate(ruleId),
+  async ({ruleId, deviceId}: {ruleId: string; deviceId: string}) => rulesRequests.activate(ruleId, deviceId),
 );
 
 export {

@@ -1,10 +1,3 @@
-/*
- * Copyright 2022 Sensative AB
- * 
- * This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at https://mozilla.org/MPL/2.0/.
- */
 import React, {useEffect} from 'react';
 
 // Logic
@@ -75,7 +68,7 @@ const NameStep = (props: NameStepProps) => {
           placeholder='Name'
           height={'40px'}
           value={form.formInputs.name.value as string}
-          onChange={(evt: React.ChangeEvent<HTMLInputElement>) => {
+          onChange={evt => {
             form.setInputValue('name', evt.target.value);
             form.showInputValidation('name');
           }}

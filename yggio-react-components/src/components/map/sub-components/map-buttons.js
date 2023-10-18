@@ -1,26 +1,21 @@
-/*
- * Copyright 2022 Sensative AB
- * 
- * This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at https://mozilla.org/MPL/2.0/.
- */
 import React from 'react';
-import {Icon} from 'react-icons-kit';
 import {
-  arrows,
-  plus,
-  minus,
-  locationArrow
-} from 'react-icons-kit/fa';
+  MdOutlineZoomOutMap as MoveIcon,
+  MdAdd as PlusIcon,
+  MdRemove as MinusIcon,
+  MdToggleOff as ToggleOffIcon,
+  MdToggleOn as ToggleOnIcon,
+  MdNearMe as LocationIcon,
+} from 'react-icons/md';
 import toast from 'react-hot-toast';
+import {useTranslation} from 'react-i18next';
 import {MapButtonsLayer} from '../styled';
 import Button from '../../button';
 import {GEO_ERROR_CODES} from '../../../constants';
 
 
 const MapButtons = props => {
-
+  const {t} = useTranslation();
   const getLocation = () => {
     navigator.geolocation.getCurrentPosition(
       pos => {
@@ -59,7 +54,7 @@ const MapButtons = props => {
       {!props.viewOnly && (
         <Button
           margin={'3px'}
-          content={<Icon size={20} icon={arrows} />}
+          content={<MoveIcon size={18} />}
           color={'green'}
           height={'30px'}
           width={'30px'}
@@ -71,7 +66,7 @@ const MapButtons = props => {
         props.showGetLocation &&
           <Button
             margin={'3px'}
-            content={<Icon size={20} icon={locationArrow} />}
+            content={<LocationIcon size={15} />}
             color={'green'}
             height={'30px'}
             width={'30px'}
@@ -82,7 +77,7 @@ const MapButtons = props => {
       <Button
         margin={'3px'}
         aria-label={'Plus'}
-        content={<Icon size={20} icon={plus} />}
+        content={<PlusIcon size={22} />}
         color={'green'}
         height={'30px'}
         width={'30px'}
@@ -96,7 +91,7 @@ const MapButtons = props => {
       <Button
         margin={'3px'}
         aria-label={'Minus'}
-        content={<Icon size={20} icon={minus} />}
+        content={<MinusIcon size={20}/>}
         color={'green'}
         height={'30px'}
         width={'30px'}
@@ -107,6 +102,36 @@ const MapButtons = props => {
           }
         }}
       />
+      {props.autoZoom && (
+        <Button
+          title={t('map.autoZoom')}
+          margin={'3px'}
+          aria-label={'ToggleOn'}
+          content={<ToggleOnIcon size={20} />}
+          color={'green'}
+          height={'30px'}
+          width={'30px'}
+          borderRadius={'5px'}
+          onClick={() => {
+            props.setAutoZoom(false);
+          }}
+        />
+      )}
+      {!props.autoZoom && (
+        <Button
+          title={t('map.autoZoom')}
+          margin={'3px'}
+          aria-label={'ToggleOff'}
+          content={<ToggleOffIcon size={20} />}
+          color={'green'}
+          height={'30px'}
+          width={'30px'}
+          borderRadius={'5px'}
+          onClick={() => {
+            props.setAutoZoom(true);
+          }}
+        />
+      )}
     </MapButtonsLayer>
   );
 };

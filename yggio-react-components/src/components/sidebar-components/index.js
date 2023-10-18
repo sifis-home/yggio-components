@@ -1,15 +1,7 @@
-/*
- * Copyright 2022 Sensative AB
- * 
- * This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at https://mozilla.org/MPL/2.0/.
- */
 import React from 'react';
 import {compose} from 'lodash/fp';
 import PropTypes from 'prop-types';
-import {Icon} from 'react-icons-kit';
-import {angleDoubleLeft as closeIcon} from 'react-icons-kit/fa/angleDoubleLeft';
+import {MdKeyboardDoubleArrowLeft as CloseIcon} from 'react-icons/md';
 
 import {withOpenSidebarOnResize} from './effects';
 import sidebarState from './state';
@@ -67,7 +59,7 @@ const RawSidebar = props => (
       isSidebarOpen={props.isSidebarOpen}
       siblingWidth={props.siblingWidth}
     >
-      <Icon icon={closeIcon} size={18} />
+      <CloseIcon size={16} />
       <p>Close sidebar</p>
     </CloseButton>
   </SidebarContainer>

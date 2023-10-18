@@ -1,21 +1,20 @@
 {
+  "ts-node": {
+    "compilerOptions": {
+      "module": "commonjs"
+    }
+  },
   "compilerOptions": {
-    // here baseUrl is set at ./src (good practive), can
-    // be set to '.'
     "baseUrl": ".",
     "paths": {
-      // Declare deps here (keep them in sync with what
-      // you defined in the package.json)
-      // PS: path are relative to baseUrl
       "yggio-react-components/*": [
         "../../shared-modules/yggio-react-components/src/*"
       ],
-      // if you have a barrel in ui-lib
       "yggio-react-components": [
         "../../shared-modules/yggio-react-components/src/index"
       ]
     },
-    "target": "es5",
+    "target": "es6",
     "lib": [
       "dom",
       "dom.iterable",
@@ -32,11 +31,12 @@
     "module": "esnext",
     "moduleResolution": "node",
     "resolveJsonModule": true,
-    "isolatedModules": true,
-    "jsx": "preserve"
+    "jsx": "preserve",
+    "isolatedModules": true
   },
   "include": [
     "next-env.d.ts",
+    "custom.d.ts",
     "**/*.ts",
     "**/*.tsx"
   ],

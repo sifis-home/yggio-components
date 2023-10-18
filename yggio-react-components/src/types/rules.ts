@@ -1,10 +1,3 @@
-/*
- * Copyright 2022 Sensative AB
- * 
- * This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at https://mozilla.org/MPL/2.0/.
- */
 interface Rule {
   _id: string;
   disabled?: boolean;
@@ -42,10 +35,28 @@ interface RuleCreationTemplate {
   action: Omit<RuleAction, '_id'>;
 }
 
-export {
+interface RuleButton {
+  _id: string;
+  name: string;
+  owner: string;
+  buttonName: string;
+  deviceName: string;
+  deviceId: string;
+  message: {
+    command: string;
+  };
+  actionType: string;
+  ruleId: string;
+}
+
+type CreateRuleButton = Omit<RuleButton, '_id' | 'name' | 'ruleId'>;
+
+export type {
   Rule,
   Rules,
   IdKeyedRules,
   RuleAction,
   RuleCreationTemplate,
+  RuleButton,
+  CreateRuleButton,
 };

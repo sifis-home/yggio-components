@@ -1,16 +1,9 @@
-/*
- * Copyright 2022 Sensative AB
- * 
- * This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at https://mozilla.org/MPL/2.0/.
- */
 import _ from 'lodash';
 import {UseQueryResult} from '@tanstack/react-query';
 import queryString from 'query-string';
 
-import {AddedDevice, Field, AvailableFields} from './types';
-import {Device, Devices, InputOptions} from '../../types';
+import {Field, AvailableFields} from './types';
+import {Devices, InputOptions} from '../../types';
 
 const NO_NAME = 'no-name';
 
@@ -26,26 +19,11 @@ const deviceIdsInUrlSelector = () => {
   return devices;
 };
 
-const addedDevicesSelector = (addedDevicesQueries: UseQueryResult<Device, unknown>[]) => {
-  const acc: AddedDevice[] = [];
-  const fields = _.reduce(addedDevicesQueries, (result, query) => {
-    const res = query.data;
-    if (res) {
-      result.push({
-        id: res._id,
-        name: res.name || NO_NAME,
-      });
-    }
-    return result;
-  }, acc);
-  return fields;
-};
-
 const devicesSelector = (data: unknown) => {
   return _.map(data as [], device => _.pick(device, ['_id', 'name']));
 };
 
-const addDeviceOptionsSelector = (addedDevices: AddedDevice[], devices?: Devices) => {
+const addDeviceOptionsSelector = (addedDevices: Devices, devices?: Devices) => {
   const addedDevicesIds = _.map(addedDevices, 'id');
   const notYetAddedDevices = _.filter(devices, device => {
     return !_.includes(addedDevicesIds, device._id);
@@ -57,7 +35,7 @@ const addDeviceOptionsSelector = (addedDevices: AddedDevice[], devices?: Devices
 };
 
 const availableFieldsSelector = (
-  addedDevies: AddedDevice[],
+  addedDevies: Devices,
   fieldsQueries: UseQueryResult<unknown, unknown>[],
 ) => {
   const acc: AvailableFields = {};
@@ -66,7 +44,7 @@ const availableFieldsSelector = (
     if (res) {
       _.each(res, field => {
         const old = result[field] || [];
-        result[field] = [...old, addedDevies[index].id];
+        result[field] = [...old, addedDevies[index]._id];
       });
     }
     return result;
@@ -122,7 +100,6 @@ const chartEntriesSelector = (
 
 export {
   deviceIdsInUrlSelector,
-  addedDevicesSelector,
   devicesSelector,
   addDeviceOptionsSelector,
   availableFieldsSelector,

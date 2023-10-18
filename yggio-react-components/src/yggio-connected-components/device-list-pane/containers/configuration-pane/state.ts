@@ -1,10 +1,3 @@
-/*
- * Copyright 2022 Sensative AB
- * 
- * This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at https://mozilla.org/MPL/2.0/.
- */
 import {Action, InputValue} from '../../../../types';
 import {
   generateForm,
@@ -134,10 +127,16 @@ const loraFormConfig = {
     }
   },
   confirmed: {
-    defaultValue: false,
+    defaultValue: 'false',
     validation: {
       visibilityType: VALIDATION_VISIBILITY_TYPES.optIn,
     }
+  },
+  flush: {
+    defaultValue: 'false',
+    validation: {
+      visibilityType: VALIDATION_VISIBILITY_TYPES.optIn,
+    },
   },
 };
 
@@ -155,6 +154,9 @@ const navigationState = {
 export {
   navigationState,
   formState,
+};
+
+export type {
   NavState,
   Actions,
 };

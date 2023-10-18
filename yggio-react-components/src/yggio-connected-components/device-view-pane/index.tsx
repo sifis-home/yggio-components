@@ -1,23 +1,16 @@
-/*
- * Copyright 2022 Sensative AB
- * 
- * This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at https://mozilla.org/MPL/2.0/.
- */
 import React from 'react';
 import _ from 'lodash';
 import {NextRouter} from 'next/router';
+import {useTranslation} from 'react-i18next';
 
 // Logic
 import {selectNumItems, selectCalculations} from './selectors';
-import withLanguage from '../../hocs/with-language';
 import {COLORS} from '../../constants';
 import {useLocalState} from '../../hooks';
-import {Translate, Device} from '../../types';
+import {Device} from '../../types';
 import {
   TAB_ITEMS,
-  SIDEBAR_SIBLING_WIDTH,
+  DEFAULT_TAB_WIDTH,
   LORA_TAB_ITEMS,
   BOX2_TAB_ITEMS,
   REAL_ESTATE_CORE_TAB_ITEM,
@@ -29,27 +22,32 @@ import {
 } from '../../api';
 
 // UI
-import {modalState} from '../../components/modal';
+import {ErrorView} from '../../global/styled';
 import RecDeviceEditor from '../rec-device-editor';
 import {Calculations} from './containers';
 import DetailsSidebar from './sub-components/sidebar';
 import HeadingBar from './sub-components/heading-bar';
 import ContainerBox from '../../components/container-box';
 import Spinner from '../../components/spinner';
+import {getTabItems} from './utils';
 import {
-  AccessRights,
+  GeneralInfo,
   Specifications,
+  Data,
+  Charts,
+  Logs,
+  Translators,
+  Position,
+  AccessRights,
   LoRaControl,
   Channels,
   Box2Downlink,
-  GeneralInfo,
+  Commands,
   ContextualParameters,
-  Data,
   ReportInterval,
-  Charts,
   Tools,
-  Position,
 } from './sub-components';
+
 import {
   SidebarParent,
   SidebarSibling,
@@ -64,85 +62,96 @@ import {
 interface BasicDeviceDetailPaneProps {
   deviceId: string;
   tabId: string;
-  t: Translate;
   router: NextRouter;
 }
 
 const DeviceViewPane = (props: BasicDeviceDetailPaneProps) => {
 
+  // Hooks
+  const {t} = useTranslation();
+
   const deviceQuery = devicesApi.useDeviceQuery({deviceId: props.deviceId});
 
-  const device = deviceQuery.data;
-
   const recConnectorDevicesQuery = devicesApi.useConnectorDevicesQuery('RealEstateCore');
-
   const channelsQuery = channelsApi.useChannelsQuery(props.deviceId);
   const calculationsQuery = calculationsApi.useCalculationsQuery();
-  const calculationsItems = selectCalculations({calculations: calculationsQuery.data, device});
 
   const sidebarForm = useLocalState(sidebarState);
-  const modalForm = useLocalState(modalState);
 
-  const numItems = selectNumItems({
-    calculations: calculationsItems,
-    channels: channelsQuery.data,
-    contextualParameters: device?.contextMap,
-  });
+  const hasRecConnector = !_.isEmpty(recConnectorDevicesQuery.data);
+  const tabItems = getTabItems(hasRecConnector, deviceQuery.data);
+  const tabItem = _.find(tabItems, {path: props.tabId});
+
+  // Alternative renders
 
   if (deviceQuery.isError) {
-    return <div>Failed to get device</div>;
+    return <ErrorView>Failed to get device</ErrorView>;
   }
 
   if (deviceQuery.isLoading) {
     return (
       <LoadingView>
         <Spinner color={COLORS.greenRacing} size={30} margin={'0 0 5px 0'} />
-        {props.t('phrases.fetchingDevice')}...
+        {t('phrases.fetchingDevice')}...
       </LoadingView>
     );
   }
 
+  if (!tabItem) {
+    return <ErrorView>404 - Page does not exist</ErrorView>;
+  }
+
+  // Selectors
+
+  const device = deviceQuery.data;
+
+  const calculationsItems = selectCalculations({calculations: calculationsQuery.data, device});
+
+  const numItems = selectNumItems({
+    device,
+    calculations: calculationsItems,
+    channels: channelsQuery.data,
+  });
+
+  const tabWidth = tabItem.width || DEFAULT_TAB_WIDTH;
+
   return (
     <SidebarParent>
       <DetailsSidebar
-        device={device!}
+        device={device}
         router={props.router}
         tabId={props.tabId}
         isSidebarOpen={sidebarForm.isSidebarOpen}
         closeSidebar={sidebarForm.closeSidebar}
         openSidebar={sidebarForm.openSidebar}
         calculations={calculationsQuery.data}
-        statusModal={modalForm}
         numItems={numItems}
-        siblingWidth={SIDEBAR_SIBLING_WIDTH}
-        hasRecConnector={!_.isEmpty(recConnectorDevicesQuery.data)}
-        t={props.t}
+        siblingWidth={tabWidth}
+        tabItems={tabItems!}
       />
       <SidebarSibling isSidebarOpen={sidebarForm.isSidebarOpen}>
         <MainContentWrapper>
-          <MainContentContainer maxWidth={SIDEBAR_SIBLING_WIDTH}>
+          <MainContentContainer maxWidth={tabWidth}>
             <HeadingBar
               closeSidebar={sidebarForm.closeSidebar}
               openSidebar={sidebarForm.openSidebar}
               isSidebarOpen={sidebarForm.isSidebarOpen}
-              tabId={props.tabId}
-              siblingWidth={SIDEBAR_SIBLING_WIDTH}
-              t={props.t}
+              tabItem={tabItem}
+              siblingWidth={tabWidth}
             />
             <ContainerBox padding={'30px'}>
               {{
                 [TAB_ITEMS.generalInfo.path]: (
                   <GeneralInfo
-                    deviceQuery={deviceQuery}
+                    device={device}
                     router={props.router}
-                    t={props.t}
                   />
                 ),
                 [TAB_ITEMS.specifications.path]: (
-                  <Specifications
-                    device={device!}
-                    t={props.t}
-                  />
+                  <Specifications device={device} />
+                ),
+                [TAB_ITEMS.translators.path]: (
+                  <Translators device={device} />
                 ),
                 [TAB_ITEMS.position.path]: (
                   <Position
@@ -152,49 +161,35 @@ const DeviceViewPane = (props: BasicDeviceDetailPaneProps) => {
                 ),
                 [TAB_ITEMS.channels.path]: (
                   <Channels
-                    device={device!}
+                    device={device}
                     channels={channelsQuery.data}
-                    t={props.t}
                   />
                 ),
                 [TAB_ITEMS.calculations.path]: (
                   <Calculations
-                    device={device!}
+                    device={device}
                     router={props.router}
                     calculations={calculationsQuery.data}
                     calculationsItems={calculationsItems}
-                    t={props.t}
                   />
                 ),
                 [TAB_ITEMS.accessrights.path]: (
-                  <AccessRights
-                    device={device!}
-                    t={props.t}
-                  />
+                  <AccessRights deviceId={device._id} />
                 ),
                 [LORA_TAB_ITEMS.loraControl.path]: (
-                  <LoRaControl
-                    device={device!}
-                    t={props.t}
-                  />
+                  <LoRaControl device={device} />
                 ),
                 [TAB_ITEMS.data.path]: (
-                  <Data
-                    device={device!}
-                    t={props.t}
-                  />
+                  <Data device={device} />
                 ),
                 [BOX2_TAB_ITEMS.downlink.path]: (
-                  <Box2Downlink
-                    deviceId={props.deviceId}
-                    t={props.t}
-                  />
+                  <Box2Downlink deviceId={props.deviceId} />
                 ),
                 [TAB_ITEMS.contextualParameters.path]: (
-                  <ContextualParameters
-                    device={device!}
-                    t={props.t}
-                  />
+                  <ContextualParameters device={device} />
+                ),
+                [TAB_ITEMS.commands.path]: (
+                  <Commands device={device}/>
                 ),
                 [TAB_ITEMS.charts.path]: (
                   <Charts
@@ -203,20 +198,19 @@ const DeviceViewPane = (props: BasicDeviceDetailPaneProps) => {
                   />
                 ),
                 [TAB_ITEMS.reportInterval.path]: (
-                  <ReportInterval
-                    device={device!}
-                  />
+                  <ReportInterval device={device} />
                 ),
                 [TAB_ITEMS.tools.path]: (
-                  <Tools
-                    device={device!}
-                  />
+                  <Tools device={device} />
                 ),
                 [REAL_ESTATE_CORE_TAB_ITEM.path]: (
                   <RecDeviceEditor
                     deviceId={props.deviceId}
                     connectors={recConnectorDevicesQuery.data as Device[]}
                   />
+                ),
+                [TAB_ITEMS.logs.path]: (
+                  <Logs deviceId={props.deviceId} />
                 ),
               }[props.tabId]}
             </ContainerBox>
@@ -227,4 +221,4 @@ const DeviceViewPane = (props: BasicDeviceDetailPaneProps) => {
   );
 };
 
-export default withLanguage()(DeviceViewPane);
+export default DeviceViewPane;

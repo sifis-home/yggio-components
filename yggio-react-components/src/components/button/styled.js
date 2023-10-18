@@ -1,16 +1,6 @@
-/*
- * Copyright 2022 Sensative AB
- * 
- * This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at https://mozilla.org/MPL/2.0/.
- */
-// button/styled.js
-
 import _ from 'lodash';
 import styled from 'styled-components';
 import PropTypes from 'prop-types';
-import Icon from 'react-icons-kit';
 
 import {
   SIZES,
@@ -41,8 +31,8 @@ const resolveBorderColor = ({disabled, color, style}) => {
   return color || _.get(style, 'color', DEFAULT_PRESET.ghosted.border);
 };
 
-const resolveBorder = ({ghosted, disabled, color, style}) => {
-  if (!ghosted) {
+const resolveBorder = ({ghosted, disabled, color, style, noBorder}) => {
+  if (!ghosted || noBorder) {
     return 'none';
   }
   const borderColor = resolveBorderColor({ghosted, disabled, color, style});
@@ -143,11 +133,6 @@ const StyledButton = styled.button`
   }
 `;
 
-const StyledIcon = styled(Icon)`
-  order: ${({iconPosition}) => (iconPosition === 'right' ? 1 : 0)};
-  margin: ${({iconPosition}) => (iconPosition === 'right' ? '0 0 0 8px' : '0 8px 0 0')};
-`;
-
 StyledButton.propTypes = {
   ghosted: PropTypes.bool,
   disabled: PropTypes.bool,
@@ -160,15 +145,7 @@ StyledButton.propTypes = {
   padding: PropTypes.string,
 };
 
-StyledIcon.propTypes = {
-  size: PropTypes.number,
-  icon: PropTypes.object,
-  iconPosition: PropTypes.string,
-};
-
-
 export {
   StyledButton,
   resolveTextColor,
-  StyledIcon,
 };

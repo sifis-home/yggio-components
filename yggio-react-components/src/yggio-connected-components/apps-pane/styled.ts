@@ -1,20 +1,15 @@
-/*
- * Copyright 2022 Sensative AB
- * 
- * This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at https://mozilla.org/MPL/2.0/.
- */
 import styled from 'styled-components';
 
 const SearchBar = styled.div`
   display: flex;
-  flex-direction: row-reverse;
+  justify-content: right;
   margin: 20px 0 0 0;
+  gap: 7px;
 
   @media (max-width: 700px) {
     flex-direction: column;
     align-items: start;
+    margin-bottom: 20px;
   }
 `;
 
@@ -24,12 +19,10 @@ const HeadingBar = styled.div`
 
 const Heading = styled.p`
   font-size: 17px;
-  margin: 0;
 `;
 
 const SubHeading = styled.p`
   font-size: 13px;
-  margin: 3px 0 0 0;
   color: #555;
 `;
 
@@ -37,6 +30,11 @@ const AppsContainer = styled.div`
   display: flex;
   flex-wrap: wrap;
   gap: 20px 20px;
+  padding: 30px;
+
+  @media (max-width: 700px) {
+    padding: 10px 5px;
+  }
 `;
 
 const AppContainer = styled.div`
@@ -77,7 +75,6 @@ const AppInfoContainer = styled.div`
 const AppName = styled.p`
   font-size: 14px;
   font-weight: bold;
-  margin: 2px 0 8px 0;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -86,20 +83,22 @@ const AppName = styled.p`
 const AppTagline = styled.p`
   margin: 0;
   font-size: 13px;
-  margin: 0 0 12px 0;
+  margin: 0 0 8px 0;
   color: #333;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
 `;
 
 const TagsContainer = styled.div`
+  max-width: 430px;
   display: flex;
-  overflow-x: hidden;
+  overflow-x: auto;
 `;
 
-const NoAppsNote = styled.p`
+const NoAppsNote = styled.div`
+  display: flex;
   width: 100%;
+  height: 100px;
+  justify-content: center;
+  align-items: center;
   text-align: center;
   color: #777;
 `;

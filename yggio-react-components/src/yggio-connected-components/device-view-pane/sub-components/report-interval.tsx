@@ -1,14 +1,6 @@
-/*
- * Copyright 2022 Sensative AB
- * 
- * This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at https://mozilla.org/MPL/2.0/.
- */
 import React, {useState} from 'react';
 import {useQueryClient, useMutation} from '@tanstack/react-query';
-import {Icon} from 'react-icons-kit';
-import {ic_info_outline as infoIcon} from 'react-icons-kit/md/ic_info_outline';
+import {MdInfoOutline as InfoIcon} from 'react-icons/md';
 import toast from 'react-hot-toast';
 
 // Logic
@@ -30,6 +22,9 @@ interface Props {
   device: Device;
 }
 
+/*
+  TODO: Refactor and put into a folder
+*/
 const ReportInterval = (props: Props) => {
 
   const [isEditing, setIsEditing] = useState(false);
@@ -74,11 +69,11 @@ const ReportInterval = (props: Props) => {
   return (
     <>
       <FlexWrapper>
-        <Icon icon={infoIcon as object} size={19} style={{margin: '7px 5px 0 0'}} />
+        <InfoIcon size={23} style={{margin: '9px 8px 0 0'}} />
         <ReportIntervalNote>
           Set how often you expect this device to send a report.&nbsp;
           You can use the rule engine to set up rules that trigger when&nbsp;
-          adevice has been silent for to long.
+          a device has been silent for to long.
         </ReportIntervalNote>
       </FlexWrapper>
 
@@ -87,7 +82,7 @@ const ReportInterval = (props: Props) => {
           name={'hours'}
           label={'Hours'}
           value={isEditing ? form.formInputs.hours.value as number : hours}
-          onChange={(evt: React.ChangeEvent<HTMLInputElement>) => form.setInputValue('hours', evt.target.value)}
+          onChange={evt => form.setInputValue('hours', evt.target.value)}
           width={'100px'}
           margin={'0 10px 0 0'}
           isDisabled={!isEditing}
@@ -98,7 +93,7 @@ const ReportInterval = (props: Props) => {
           max={'59'}
           label='Minutes'
           value={isEditing ? form.formInputs.minutes.value as number : minutes}
-          onChange={(evt: React.ChangeEvent<HTMLInputElement>) => form.setInputValue('minutes', evt.target.value)}
+          onChange={evt => form.setInputValue('minutes', evt.target.value)}
           width={'100px'}
           margin={'0 10px 0 0'}
           isDisabled={!isEditing}
@@ -109,7 +104,7 @@ const ReportInterval = (props: Props) => {
           min={'0'}
           max={'59'}
           value={isEditing ? form.formInputs.seconds.value as number : seconds}
-          onChange={(evt: React.ChangeEvent<HTMLInputElement>) => form.setInputValue('seconds', evt.target.value)}
+          onChange={evt => form.setInputValue('seconds', evt.target.value)}
           width={'100px'}
           isDisabled={!isEditing}
         />
